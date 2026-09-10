@@ -1,0 +1,85 @@
+Build a premium, modern, multi-page website for a trauma healing & therapy practice called "RD Trauma Healing" run by Rebecca Dakin. This must feel like a high-end boutique wellness brand — think Calm app meets a luxury spa meets a therapist's private sanctuary. Avoid anything that looks like a generic template, Canva site, or stock Squarespace layout.
+
+1. COLOR PALETTE (use exact tones, not generic Bootstrap colors)
+Primary background: Warm cream / ivory — 
+#FAF6F0
+Secondary background: Soft sage green — 
+#A8B79A (muted, not neon)
+Accent 1 (deep): Dusty plum/lavender — 
+#7D6485
+Accent 2: Warm terracotta/gold — 
+#C9A876 (for CTA highlights, used sparingly)
+Dark text/contrast: Deep charcoal-navy — 
+#2C3339 (never pure black)
+Gradient overlays: Soft gold-to-cream radial gradient (like warm sunlight) for hero sections only
+Use a 60-30-10 rule: 60% cream/ivory, 30% sage/lavender, 10% gold accent
+2. TYPOGRAPHY
+Headings: An elegant, slightly editorial serif (like Fraunces, Canela, or Playfair Display) — warm, human, not corporate
+Body text: Clean modern sans-serif (like Inter or General Sans) — highly readable
+Accent/handwritten font: A soft script font (like Caveat or Playfair Italic) used ONLY for small emotional callouts/quotes — never for full paragraphs
+Generous line-height and letter-spacing — should feel like it breathes, not cramped
+3. MODERN DESIGN ELEMENTS TO INCLUDE
+Soft glassmorphism cards (subtle blur + transparency) for quote callouts
+Micro-interactions: buttons that softly scale/glow on hover, not hard 3D shadows
+Organic, asymmetric section shapes (soft blob/wave dividers between sections instead of hard straight lines)
+Subtle parallax scroll effect on hero background
+Custom line-art icons (botanical/lotus-themed, matching the logo) — NOT generic Font Awesome icons
+Soft grain/texture overlay on background sections for warmth (avoid flat, sterile look)
+Generous white space — nothing should feel cramped or "busy"
+4. SITE STRUCTURE (Multi-page, not just one long scroll)
+
+Sticky/floating header with logo left, nav center, "Book a Call" button right (blurred glass background on scroll)
+
+Page 1 — Home
+Hero: Full-width warm photo of Rebecca with gradient overlay, headline "Healing that meets you where you are...", sub-hook "Tried CBT or other free NHS services & they didn't work?", CTA "Book a Free Discovery Call"
+Trust bar: small row of credentials/certifications icons
+"Gentle support. Real transformation." — script-font tagline section with soft background texture
+Services preview (3-4 cards, "See all services" link to Services page)
+Glassmorphism quote card: "You don't have to have it all figured out. You just have to be ready."
+Testimonials carousel
+Process section (3 steps: Reach Out → Free Call → Begin Healing)
+Final CTA banner before footer
+Page 2 — About
+Large warm portrait of Rebecca
+Full bio, qualifications, personal healing philosophy
+Second quote callout: "You are not too much. You just need the right space to heal."
+Optional: short personal video placeholder
+Page 3 — Services
+Full grid of all modalities (IFS, DBT, Talking Therapy, Somatic techniques, Neuroplasticity, Attachment style, Shadow work, Inner child healing, Spiritual connection)
+Each service expandable/clickable for more detail (accordion or modal)
+Custom icon per service
+Page 4 — Testimonials
+Full testimonial wall (grid/masonry layout)
+Star ratings, client initials only (privacy-conscious)
+Page 5 — FAQ
+Accordion-style: session length, pricing, online vs in-person, confidentiality, what to expect first session
+Page 6 — Contact / Booking
+Embedded calendar booking widget (Calendly-style placeholder)
+Email, WhatsApp, phone as alternate contact cards
+Simple contact form
+Map/location if applicable
+
+Footer (all pages):
+
+Logo + tagline: "Person-Centred • Trauma-Informed • Compassionate Care"
+Quick links, social icons, privacy policy, WhatsApp floating button (bottom-right, all pages)
+
+5. TECHNICAL REQUIREMENTS (Updated)
+Built with React + Tailwind CSS
+Use shadcn/ui components as the base UI library — Accordion (for FAQ), Card (for services/testimonials), Button, Dialog/Modal (for service detail popups), Carousel (for testimonials), Tabs if needed — customize their default styling to match the brand palette (cream/sage/lavender/gold), don't leave them looking like default shadcn theme
+Use Framer Motion for all animations:
+Scroll-triggered fade-in/slide-up animations for each section
+Smooth hover micro-interactions on buttons and cards (scale + soft glow, not hard shadows)
+Page transition animations between routes
+Subtle parallax effect on hero background image
+Staggered entrance animations for service cards/testimonial grid
+Component-based structure (Header, Footer, Hero, ServiceCard, TestimonialCard, FAQAccordion, BookingWidget, etc. as reusable components)
+Fully responsive — rigorously tested for mobile (no overlapping text/images, this is critical — a previous site had this exact bug)
+Lazy-loaded images for performance
+Accessible: proper contrast ratios, alt text, keyboard navigation, readable font sizes (min 16px body), shadcn components already help with this but verify focus states are visible
+SEO-friendly semantic HTML structure (proper h1/h2 hierarchy, meta tags)
+Fast load time — optimize images, minimal unnecessary libraries beyond shadcn/ui + Framer Motion
+
+6. OVERALL FEEL
+
+The end result should look like it belongs on a "best therapist websites 2026" curated list — distinctive, warm, editorial, calming, and premium. It should NOT look like a builder template. Every section should feel intentional, emotionally safe, and beautifully crafted — like the digital equivalent of walking into a softly lit, plant-filled therapy room.
