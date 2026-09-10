@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "RD Trauma Healing"
+description = "A warm, premium one-page website for Rebecca Dakin's trauma-informed therapy practice, designed to help visitors feel safe, understood, and ready to take the first step toward healing."
+version = "1.0.0"
+id = "artifacts/rd-trauma-healing"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25022
+
+[services.development]
+run = "pnpm --filter @workspace/rd-trauma-healing run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/rd-trauma-healing", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/rd-trauma-healing/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25022"
+BASE_PATH = "/"
