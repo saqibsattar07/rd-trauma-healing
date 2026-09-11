@@ -124,3 +124,47 @@ a { color: inherit; text-decoration: none; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/*
+ * Keep the quiet, low-contrast palette while ensuring supporting copy remains
+ * readable on cream, sage, gold, plum, and charcoal surfaces. These selectors
+ * preserve the existing utility classes and visual hierarchy, but remove the
+ * faintest text treatments that were difficult to read at normal size.
+ */
+[class*="text-[#2C3339]/40"],
+[class*="text-[#2C3339]/45"],
+[class*="text-[#2C3339]/50"],
+[class*="text-[#2C3339]/55"],
+[class*="text-[#2C3339]/60"],
+[class*="text-[#2C3339]/65"] {
+  color: #596168;
+}
+
+[class*="text-[#2C3339]/68"],
+[class*="text-[#2C3339]/70"] {
+  color: #2C3339;
+}
+
+[class*="text-[#FAF6F0]/40"] {
+  color: #bdb7b0;
+}
+
+[class*="text-[#FAF6F0]/45"],
+[class*="text-[#FAF6F0]/50"],
+[class*="text-[#FAF6F0]/55"],
+[class*="text-[#FAF6F0]/60"] {
+  color: #d9d2cb;
+}
+
+[class*="text-[#FAF6F0]/65"] {
+  color: #e8e1d9;
+}
+
+[class*="placeholder:text-[#FAF6F0]/35"]::placeholder {
+  color: #bdb7b0;
+  opacity: 1;
+}
+
+[class*="opacity-65"] {
+  opacity: .82;
+}
