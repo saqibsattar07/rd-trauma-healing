@@ -199,3 +199,10 @@ a { color: inherit; text-decoration: none; }
   color: #2C3339 !important;
   opacity: 1;
 }
+
+/* All charcoal anchor CTAs use the same high-contrast light label,
+ * including the header, mobile menu, Services prompt, and footer CTA. */
+a[class*="bg-[#2C3339]"],
+a[class*="bg-[#2C3339]"] span {
+  color: #FAF6F0 !important;
+}

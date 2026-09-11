@@ -50,8 +50,8 @@ export function Header() {
               </Link>
             ))}
           </nav>
-          <Link href="/contact" data-testid="link-header-contact" className="focus-ring hidden items-center gap-2 rounded-full bg-[#2C3339] px-5 py-3 text-[11px] font-bold uppercase tracking-[.12em] text-[#FAF6F0] transition-transform hover:-translate-y-0.5 sm:flex">
-            <span className="text-[#FAF6F0]">Book a gentle chat</span> <ArrowRight size={14} />
+          <Link href="/contact" data-testid="link-header-contact" className="focus-ring hidden items-center gap-2 rounded-full bg-[#2C3339] px-5 py-3 text-[11px] font-bold uppercase tracking-[.12em] !text-[#FAF6F0] transition-transform hover:-translate-y-0.5 sm:flex">
+            <span className="!text-[#FAF6F0]">Book a gentle chat</span> <ArrowRight size={14} />
           </Link>
           <button type="button" aria-expanded={menuOpen} aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} onClick={() => setMenuOpen((open) => !open)} data-testid="button-mobile-menu" className="focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-[#2C3339]/15 text-[#7D6485] sm:hidden">
             {menuOpen ? <X size={19} /> : <Menu size={19} />}
@@ -64,7 +64,7 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
-            <Link href="/contact" onClick={() => setMenuOpen(false)} data-testid="link-mobile-contact" className="mt-2 flex items-center justify-between rounded-xl bg-[#2C3339] px-4 py-3 text-xs font-bold uppercase tracking-[.12em] text-[#FAF6F0]">Book a gentle chat <ArrowRight size={15} /></Link>
+            <Link href="/contact" onClick={() => setMenuOpen(false)} data-testid="link-mobile-contact" className="mt-2 flex items-center justify-between rounded-xl bg-[#2C3339] px-4 py-3 text-xs font-bold uppercase tracking-[.12em] !text-[#FAF6F0]">Book a gentle chat <ArrowRight size={15} /></Link>
           </nav>
         )}
       </div>
