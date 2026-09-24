@@ -109,6 +109,11 @@ flowchart TD
 - [x] **Typecheck & Production Build Verification**
   - Verified `tsc -p tsconfig.json --noEmit` exits with 0 errors.
   - Verified `npm run build` bundles assets to `dist/public` without build failures.
+- [x] **Vercel Deployment Optimization**
+  - Removed obsolete `pnpm-lock.yaml` and `pnpm-workspace.yaml` which triggered `ERR_PNPM_OUTDATED_LOCKFILE`.
+  - Added root `package-lock.json` and explicit `packageManager: "npm@10.8.2"` in root `package.json`.
+  - Configured `installCommand: "npm install"` in `vercel.json` for deterministic CI installs on Vercel.
+  - Pushed fix commit `948c29a` to GitHub `origin main`.
 
 ### Pending Tasks
 
