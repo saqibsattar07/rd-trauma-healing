@@ -37,7 +37,7 @@ export function Header() {
       <div className="mx-auto mt-3 w-[calc(100%-1.5rem)] max-w-[1320px] md:mt-5 md:w-[calc(100%-3rem)]">
         <div className="glass flex items-center justify-between rounded-full border-[#FAF6F0]/60 px-4 py-3 md:px-6">
           <Link href="/" onClick={() => setMenuOpen(false)} data-testid="link-brand" className="focus-ring flex items-center gap-3 rounded-full">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#7D6485] text-[#FAF6F0]"><img src="/rd-trauma-healing-logo.png" alt="" aria-hidden="true" className="h-full w-full object-contain" /></span>
+            <span className="flex h-9 w-9 items-center justify-center"><img src="/rd-trauma-healing-logo.png" alt="" aria-hidden="true" className="h-full w-full object-contain" /></span>
             <span className="leading-none">
               <span className="block font-serif text-[17px] tracking-[-.04em] text-[#2C3339]">RD Trauma Healing</span>
               <span className="mt-1 block text-[9px] font-bold uppercase tracking-[.2em] text-[#2C3339]/60">with Rebecca Dakin</span>
@@ -78,7 +78,7 @@ export function Footer() {
       <div className="mx-auto max-w-[1160px]">
         <div className="grid gap-12 pb-16 md:grid-cols-[1.3fr_.7fr_.85fr]">
           <div>
-            <Link href="/" data-testid="link-footer-brand" className="focus-ring inline-flex items-center gap-3 rounded-full"><span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#A8B79A] text-[#2C3339]"><img src="/rd-trauma-healing-logo.png" alt="" aria-hidden="true" className="h-full w-full object-contain" /></span><span className="font-serif text-xl">RD Trauma Healing</span></Link>
+            <Link href="/" data-testid="link-footer-brand" className="focus-ring inline-flex items-center gap-3 rounded-full"><span className="flex h-9 w-9 items-center justify-center"><img src="/rd-trauma-healing-logo.png" alt="" aria-hidden="true" className="h-full w-full object-contain" /></span><span className="font-serif text-xl">RD Trauma Healing</span></Link>
             <p className="mt-6 max-w-[330px] text-sm leading-[1.8] text-[#FAF6F0]/60">A calm, collaborative space for making sense of what happened and finding your way back to yourself.</p>
           </div>
           <div><p className="text-[10px] font-bold uppercase tracking-[.17em] text-[#C9A876]">Explore</p><div className="mt-5 space-y-3 text-sm text-[#FAF6F0]/70">{navItems.slice(1, 5).map((item) => <Link key={item.href} href={item.href} data-testid={`link-footer-${item.href.slice(1)}`} className="focus-ring block rounded-sm hover:text-[#A8B79A]">{item.label}</Link>)}</div></div>
