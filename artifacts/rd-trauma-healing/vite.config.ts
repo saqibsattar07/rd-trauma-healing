@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, type Plugin } from 'vite';
-import { saveAppointment } from './src/server/google-sheets.ts';
+import { saveAppointment } from './src/server/google-sheets';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
