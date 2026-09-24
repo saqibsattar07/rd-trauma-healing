@@ -1,0 +1,12 @@
+dist
+dist/
+node_modules
+.env
+.env.*
+!.env.example
+data/
+*service-account*.json
+*credentials*.json
+google-service-account.json
+credentials.json
+rd-trauma-healing-*.json

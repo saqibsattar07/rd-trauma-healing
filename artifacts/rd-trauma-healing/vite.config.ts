@@ -1,30 +1,52 @@
-import path from 'path';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
+import { saveAppointment } from './src/server/google-sheets.ts';
 
-import runtimeErrorOverlay from '@replit/vite-plugin-runtime-error-modal';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const rawPort = process.env.PORT;
+const rawPort = process.env.PORT || '5173';
+const port = Number(rawPort) || 5173;
+const basePath = process.env.BASE_PATH || '/';
 
-if (!rawPort) {
-  throw new Error(
-    'PORT environment variable is required but was not provided.',
-  );
-}
+function appointmentApiPlugin(): Plugin {
+  const handler = (req: any, res: any, next: any) => {
+    const url = req.url?.split('?')[0];
+    if (url === '/api/appointments' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk: any) => {
+        body += chunk;
+      });
+      req.on('end', async () => {
+        try {
+          const payload = JSON.parse(body || '{}');
+          const result = await saveAppointment(payload);
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify(result));
+        } catch (err: any) {
+          res.statusCode = 400;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ error: err.message || 'Failed to process appointment request' }));
+        }
+      });
+      return;
+    }
+    next();
+  };
 
-const port = Number(rawPort);
-
-if (Number.isNaN(port) || port <= 0) {
-  throw new Error(`Invalid PORT value: "${rawPort}"`);
-}
-
-const basePath = process.env.BASE_PATH;
-
-if (!basePath) {
-  throw new Error(
-    'BASE_PATH environment variable is required but was not provided.',
-  );
+  return {
+    name: 'appointment-api-plugin',
+    configureServer(server) {
+      server.middlewares.use(handler);
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(handler);
+    },
+  };
 }
 
 export default defineConfig({
@@ -32,41 +54,23 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    runtimeErrorOverlay(),
-    ...(process.env.NODE_ENV !== 'production' &&
-    process.env.REPL_ID !== undefined
-      ? [
-          await import('@replit/vite-plugin-cartographer').then((m) =>
-            m.cartographer({
-              root: path.resolve(import.meta.dirname, '..'),
-            }),
-          ),
-          await import('@replit/vite-plugin-dev-banner').then((m) =>
-            m.devBanner(),
-          ),
-        ]
-      : []),
+    appointmentApiPlugin(),
   ],
   resolve: {
     alias: {
-      '@': path.resolve(import.meta.dirname, 'src'),
-      '@assets': path.resolve(
-        import.meta.dirname,
-        '..',
-        '..',
-        'attached_assets',
-      ),
+      '@': path.resolve(__dirname, 'src'),
+      '@assets': path.resolve(__dirname, '..', '..', 'attached_assets'),
     },
     dedupe: ['react', 'react-dom'],
   },
-  root: path.resolve(import.meta.dirname),
+  root: __dirname,
   build: {
-    outDir: path.resolve(import.meta.dirname, 'dist/public'),
+    outDir: path.resolve(__dirname, 'dist/public'),
     emptyOutDir: true,
   },
   server: {
     port,
-    strictPort: true,
+    strictPort: false,
     host: '0.0.0.0',
     allowedHosts: true,
     fs: {

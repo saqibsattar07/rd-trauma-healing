@@ -47,3 +47,17 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Environment and Local Data
+.env
+.env.*
+!.env.example
+data/
+*service-account*.json
+*credentials*.json
+google-service-account.json
+credentials.json
+rd-trauma-healing-*.json
+.migration-backup/
+.migration-backup
+

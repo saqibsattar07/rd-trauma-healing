@@ -20,6 +20,7 @@ import {
   Sparkles,
   X,
 } from 'lucide-react';
+import { FaFacebook, FaInstagram, FaTiktok, FaWhatsapp } from 'react-icons/fa';
 
 export const navItems = [
   { label: 'Home', href: '/' },
@@ -80,9 +81,41 @@ export function Footer() {
           <div>
             <Link href="/" data-testid="link-footer-brand" className="focus-ring inline-flex items-center gap-3 rounded-full"><span className="flex h-9 w-9 items-center justify-center"><img src="/rd-trauma-healing-logo.png" alt="" aria-hidden="true" className="h-full w-full object-contain" /></span><span className="font-serif text-xl">RD Trauma Healing</span></Link>
             <p className="mt-6 max-w-[330px] text-sm leading-[1.8] text-[#FAF6F0]/60">A calm, collaborative space for making sense of what happened and finding your way back to yourself.</p>
+            <div className="mt-6 flex items-center gap-3">
+              <a
+                href="https://www.instagram.com/rebeccadakin89"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                data-testid="link-social-instagram"
+                className="focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-[#FAF6F0]/20 text-[#FAF6F0]/80 transition-colors hover:border-[#A8B79A] hover:bg-[#A8B79A]/20 hover:text-[#A8B79A]"
+              >
+                <FaInstagram size={18} />
+              </a>
+              <a
+                href="https://www.facebook.com/share/1cBakfyi8S/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                data-testid="link-social-facebook"
+                className="focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-[#FAF6F0]/20 text-[#FAF6F0]/80 transition-colors hover:border-[#A8B79A] hover:bg-[#A8B79A]/20 hover:text-[#A8B79A]"
+              >
+                <FaFacebook size={18} />
+              </a>
+              <a
+                href="https://www.tiktok.com/@rebeccadakin89?_t=ZN-90dEZ3Yp8P0&_r=1"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TikTok"
+                data-testid="link-social-tiktok"
+                className="focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-[#FAF6F0]/20 text-[#FAF6F0]/80 transition-colors hover:border-[#A8B79A] hover:bg-[#A8B79A]/20 hover:text-[#A8B79A]"
+              >
+                <FaTiktok size={17} />
+              </a>
+            </div>
           </div>
           <div><p className="text-[10px] font-bold uppercase tracking-[.17em] text-[#C9A876]">Explore</p><div className="mt-5 space-y-3 text-sm text-[#FAF6F0]/70">{navItems.slice(1, 5).map((item) => <Link key={item.href} href={item.href} data-testid={`link-footer-${item.href.slice(1)}`} className="focus-ring block rounded-sm hover:text-[#A8B79A]">{item.label}</Link>)}</div></div>
-          <div><p className="text-[10px] font-bold uppercase tracking-[.17em] text-[#C9A876]">Get in touch</p><div className="mt-5 space-y-3 text-sm text-[#FAF6F0]/70"><a href="mailto:hello@example.com" data-testid="link-footer-email" className="focus-ring block rounded-sm hover:text-[#A8B79A]">hello@example.com</a><span className="block text-[10px] uppercase tracking-[.1em] text-[#FAF6F0]/40">Email is a placeholder</span><span className="block">Bristol, UK · online worldwide</span></div></div>
+          <div><p className="text-[10px] font-bold uppercase tracking-[.17em] text-[#C9A876]">Get in touch</p><div className="mt-5 space-y-3 text-sm text-[#FAF6F0]/70"><a href="mailto:wellbeingsessions@traumahealingwithrebeccadakin.co.uk" data-testid="link-footer-email" className="focus-ring block rounded-sm hover:text-[#A8B79A] break-words">wellbeingsessions@traumahealingwithrebeccadakin.co.uk</a><a href="tel:07858077379" data-testid="link-footer-phone" className="focus-ring block rounded-sm hover:text-[#A8B79A]">07858077379</a><span className="block text-xs text-[#FAF6F0]/50">Bristol, UK · online worldwide</span></div></div>
         </div>
         <div className="flex flex-col justify-between gap-3 border-t border-[#FAF6F0]/15 pt-6 text-[10px] uppercase tracking-[.12em] text-[#FAF6F0]/40 sm:flex-row"><span>© 2026 RD Trauma Healing</span><span>Privacy · Terms · This is not an emergency service</span></div>
       </div>
@@ -91,7 +124,7 @@ export function Footer() {
 }
 
 export function WhatsAppAction() {
-  return <a href="https://wa.me/447000000000?text=Hello%20Rebecca%2C%20I%27d%20like%20to%20ask%20about%20therapy." target="_blank" rel="noreferrer" aria-label="Message RD Trauma Healing on WhatsApp, placeholder number" data-testid="link-whatsapp" className="whatsapp-pulse focus-ring fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#7D6485] text-[#FAF6F0] shadow-xl transition-transform hover:-translate-y-1"><MessageCircle size={23} strokeWidth={1.7} /></a>;
+  return <a href="https://wa.me/447858077379" target="_blank" rel="noreferrer" aria-label="Message RD Trauma Healing on WhatsApp" data-testid="link-whatsapp" className="whatsapp-pulse focus-ring fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#7D6485] text-[#FAF6F0] shadow-xl transition-transform hover:-translate-y-1"><FaWhatsapp size={27} /></a>;
 }
 
 export function SiteLayout({ children }: { children: ReactNode }) {
@@ -123,14 +156,12 @@ export function ServiceCard({ service, index, onDarkSurface = false }: { service
   return <Reveal delay={index * .06}><article data-card-index={index} className={`rounded-[1.7rem] border border-[#2C3339]/10 p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(44,51,57,.1)] ${service.accent} ${onDarkSurface ? 'home-service-card' : ''}`}><div className="flex items-start justify-between gap-5"><span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FAF6F0]/70 text-[#7D6485]"><Icon size={22} strokeWidth={1.5} /></span><span className="font-serif text-sm italic text-[#2C3339]/40">0{index + 1}</span></div><h3 className="display mt-7 text-2xl leading-tight text-[#2C3339]">{service.title}</h3><p className="mt-3 text-sm leading-[1.75] text-[#2C3339]/65">{service.summary}</p><button type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} data-testid={`button-service-${index}`} className="focus-ring mt-6 flex items-center gap-2 rounded-sm text-[11px] font-bold uppercase tracking-[.12em] text-[#7D6485]">Read more <ChevronDown size={15} className={`faq-chevron ${open ? 'is-open' : ''}`} /></button><div className={`faq-answer ${open ? 'is-open' : ''}`}><div><p className="pt-4 text-sm leading-[1.75] text-[#2C3339]/65">{service.detail}</p></div></div></article></Reveal>;
 }
 
-export function BookingWidget() {
-  const dates = ['Tue 14', 'Wed 15', 'Thu 16', 'Fri 17'];
-  const times = ['10:00', '12:30', '15:00', '17:30'];
-  const [date, setDate] = useState(dates[0]);
-  const [time, setTime] = useState(times[1]);
-  const [booked, setBooked] = useState(false);
-  if (booked) return <div className="flex min-h-[430px] flex-col items-center justify-center rounded-[2rem] bg-[#FAF6F0] p-8 text-center shadow-[0_22px_65px_rgba(44,51,57,.1)]"><span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#A8B79A] text-[#2C3339]"><Check size={28} /></span><h3 className="display mt-6 text-3xl">Your request is ready.</h3><p className="mt-3 max-w-[310px] text-sm leading-[1.7] text-[#2C3339]/65">This booking widget is a placeholder for launch. Rebecca will confirm {date} at {time} by email.</p><button type="button" onClick={() => setBooked(false)} data-testid="button-booking-reset" className="line-link mt-7 text-xs font-bold uppercase tracking-[.12em] text-[#7D6485]">Choose another time</button></div>;
-  return <div className="rounded-[2rem] bg-[#FAF6F0] p-6 shadow-[0_22px_65px_rgba(44,51,57,.1)] md:p-8"><div className="flex items-start justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#7D6485]">Placeholder booking widget</p><h3 className="display mt-2 text-3xl text-[#2C3339]">Choose a gentle beginning</h3></div><CalendarDays size={25} className="text-[#C9A876]" /></div><p className="mt-3 text-sm text-[#2C3339]/60">Select a preferred day and time. Nothing is confirmed until we speak.</p><div className="mt-7"><p className="text-[11px] font-bold uppercase tracking-[.12em] text-[#2C3339]/55">Sample availability</p><div className="mt-3 grid grid-cols-4 gap-2">{dates.map((item) => <button type="button" key={item} onClick={() => setDate(item)} data-testid={`button-date-${item.replace(' ', '-')}`} className={`focus-ring rounded-xl border p-3 text-center text-xs transition-colors ${date === item ? 'border-[#7D6485] bg-[#7D6485] text-[#FAF6F0]' : 'border-[#2C3339]/10 hover:border-[#7D6485]'}`}><span className="block text-[10px] uppercase opacity-65">{item.split(' ')[0]}</span><span className="mt-1 block font-serif text-lg">{item.split(' ')[1]}</span></button>)}</div></div><div className="mt-7"><p className="text-[11px] font-bold uppercase tracking-[.12em] text-[#2C3339]/55">Available times</p><div className="mt-3 grid grid-cols-2 gap-2">{times.map((item) => <button type="button" key={item} onClick={() => setTime(item)} data-testid={`button-time-${item.replace(':', '-')}`} className={`focus-ring rounded-xl border px-3 py-3 text-sm transition-colors ${time === item ? 'border-[#A8B79A] bg-[#A8B79A]/35 text-[#2C3339]' : 'border-[#2C3339]/10 hover:border-[#A8B79A]'}`}>{item}</button>)}</div></div><button type="button" onClick={() => setBooked(true)} data-testid="button-booking-request" className="mt-7 flex w-full items-center justify-between rounded-xl bg-[#2C3339] px-5 py-4 text-xs font-bold uppercase tracking-[.12em] text-[#FAF6F0] transition-transform hover:-translate-y-0.5">Request {date} at {time} <ArrowUpRight size={16} /></button><p className="mt-4 flex items-center gap-2 text-[10px] text-[#2C3339]/50"><LockKeyhole size={12} /> Placeholder only · no payment or commitment.</p></div>;
+import { AppointmentSystem } from '@/components/appointment-system';
+
+export function BookingWidget(props: { initialPackage?: 'single' | 'block'; className?: string }) {
+  return <AppointmentSystem {...props} />;
 }
+
+export { AppointmentSystem };
 
 export const iconSet = { HeartHandshake, Flower2, Sparkles, ShieldCheck, Leaf, Clock3 };

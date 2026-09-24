@@ -7,15 +7,19 @@ import {
   Brain,
   Check,
   ChevronDown,
+  Clock3,
   Cloud,
+  Compass,
   Ear,
   Flower2,
   HeartHandshake,
+  Mail,
   MessageCircle,
   Play,
   ShieldCheck,
   Sparkles,
   Star,
+  Sun,
   Waves,
 } from 'lucide-react';
 import {
@@ -31,20 +35,79 @@ import {
 
 function usePageMeta(title: string, description: string) {
   useEffect(() => {
-    document.title = `${title} | RD Trauma Healing`;
+    document.title = title ? `${title} | RD Trauma Healing` : 'RD Trauma Healing';
     const meta = document.querySelector('meta[name="description"]');
     if (meta) meta.setAttribute('content', description);
-    else {
-      const descriptionMeta = document.createElement('meta');
-      descriptionMeta.name = 'description';
-      descriptionMeta.content = description;
-      document.head.appendChild(descriptionMeta);
-    }
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', title ? `${title} | RD Trauma Healing` : 'RD Trauma Healing');
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', description);
+    const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+    if (twitterTitle) twitterTitle.setAttribute('content', title ? `${title} | RD Trauma Healing` : 'RD Trauma Healing');
+    const twitterDesc = document.querySelector('meta[name="twitter:description"]');
+    if (twitterDesc) twitterDesc.setAttribute('content', description);
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, [title, description]);
 }
 
-export const services: Service[] = [
+const therapyFocus = {
+  headline: 'Healing therapy for clients looking for ease from C-PTSD, domestic or narcissistic abuse, or neurodivergent difficulties.',
+  messagePrimary: 'Heal the wounds of emotional trauma, toxic relationships, or unhealthy attachments.',
+  messageSecondary: 'Find yourself again and stop living in survival mode.',
+};
+
+const specialisations = [
+  {
+    title: 'Attachment styles',
+    summary: 'Make sense of anxious, avoidant, or disorganised attachment patterns and cultivate secure emotional connection.',
+    detail: 'When closeness has historically felt unsafe or volatile, relationships become an exhausting balance of doubt and overwork. Together we gently explore your attachment patterns, build emotional safety, and support you in forming healthy, reciprocal bonds.',
+    icon: HeartHandshake,
+    accent: 'bg-[#C9A876]/25',
+  },
+  {
+    title: 'Rejection sensitivity',
+    summary: 'Soothe the acute nervous system pain, emotional flooding, or withdrawal triggered by perceived rejection.',
+    detail: 'Rejection sensitivity can make criticism, perceived distance, or perceived mistakes feel deeply painful and physically overwhelming. We build grounded self-compassion, regulate autonomic distress surges, and separate your core self-worth from external reactions.',
+    icon: Sparkles,
+    accent: 'bg-[#A8B79A]/35',
+  },
+  {
+    title: 'Hyper-vigilance within relationships',
+    summary: 'Unwind chronic fight-or-flight, anticipatory anxiety, and constant scanning so your body can finally rest.',
+    detail: 'Surviving domestic abuse, narcissistic dynamics, or prolonged emotional unsafety conditions the nervous system to stay permanently braced for threat. We work somatic and relational techniques to help you step down from alert mode and experience genuine peace.',
+    icon: ShieldCheck,
+    accent: 'bg-[#7D6485]/18',
+  },
+];
+
+const coreValues = [
+  {
+    name: 'Empowerment',
+    tag: 'Autonomy & Voice',
+    description: 'Reclaiming your personal authority, agency, and boundaries after experiences that silenced or overwhelmed you.',
+    icon: ShieldCheck,
+  },
+  {
+    name: 'Healing',
+    tag: 'Restorative Care',
+    description: 'Paced, compassionate recovery from emotional wounds and toxic dynamics, giving your nervous system time to mend.',
+    icon: HeartHandshake,
+  },
+  {
+    name: 'Alignment',
+    tag: 'Inner Congruence',
+    description: 'Reconnecting mind, body, and emotions so you can live in harmony with your authentic self instead of performing for others.',
+    icon: Compass,
+  },
+  {
+    name: 'Mental Clarity',
+    tag: 'Calm & Perspective',
+    description: 'Quieting survival mode, hyper-vigilance, and second-guessing to reveal grounded clarity, peace, and self-trust.',
+    icon: Sun,
+  },
+];
+
+const services: Service[] = [
   { title: 'Trauma-informed therapy', summary: 'A collaborative space to understand what happened and feel more at home in your life.', detail: 'We make room for the whole picture: what your mind knows, what your body remembers, and what you need now. We move with care rather than forcing a timeline.', icon: HeartHandshake, accent: 'bg-[#A8B79A]/45' },
   { title: 'Somatic support', summary: 'Gentle attention to the body, where stress and survival responses often linger.', detail: 'Together we notice patterns without judgement and build small, practical ways to feel more grounded in the moments that matter.', icon: Waves, accent: 'bg-[#C9A876]/30' },
   { title: 'Anxiety and overwhelm', summary: 'Understand the alarm system and develop tools that are realistic for your life.', detail: 'We explore the protective purpose of anxiety, then work with the thoughts, habits, and body cues that keep your world feeling too loud.', icon: Cloud, accent: 'bg-[#A8B79A]/30' },
@@ -66,68 +129,996 @@ function TestimonialCarousel() {
   const [active, setActive] = useState(0);
   const reduceMotion = useReducedMotion();
   const current = testimonials[active];
-  return <div className="relative overflow-hidden rounded-[2rem] bg-[#2C3339] p-7 text-[#FAF6F0] md:p-10"><div className="absolute right-[-3rem] top-[-4rem] h-48 w-48 rounded-full border border-[#FAF6F0]/10" /><div className="relative flex items-center justify-between"><div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#A8B79A] text-sm font-bold text-[#2C3339]">{current.initials}</span><div><p className="text-[11px] font-bold uppercase tracking-[.13em] text-[#A8B79A]">Shared with permission</p><p className="text-xs text-[#FAF6F0]/50">{current.detail}</p></div></div><div className="flex gap-1 text-[#C9A876]">{[0,1,2,3,4].map((item) => <Star key={item} size={13} fill="currentColor" />)}</div></div><motion.blockquote key={current.initials} initial={reduceMotion ? false : { opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .45 }} className="relative mt-12 max-w-[700px] font-serif text-[clamp(1.7rem,3.6vw,3rem)] leading-[1.2]">“{current.text}”</motion.blockquote><div className="relative mt-10 flex items-center justify-between border-t border-[#FAF6F0]/15 pt-5"><div className="flex gap-2">{testimonials.map((item, index) => <button type="button" key={item.initials} onClick={() => setActive(index)} aria-label={`Show testimonial ${index + 1}`} data-testid={`button-testimonial-dot-${index}`} className={`focus-ring h-2 rounded-full transition-all ${index === active ? 'w-8 bg-[#C9A876]' : 'w-2 bg-[#FAF6F0]/30'}`} />)}</div><div className="flex gap-2"><button type="button" onClick={() => setActive((active - 1 + testimonials.length) % testimonials.length)} aria-label="Previous testimonial" data-testid="button-testimonial-previous" className="focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-[#FAF6F0]/20 hover:bg-[#FAF6F0]/10"><ArrowRight className="rotate-180" size={16} /></button><button type="button" onClick={() => setActive((active + 1) % testimonials.length)} aria-label="Next testimonial" data-testid="button-testimonial-next" className="focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-[#FAF6F0]/20 hover:bg-[#FAF6F0]/10"><ArrowRight size={16} /></button></div></div></div>;
+  return (
+    <div className="relative overflow-hidden rounded-[2rem] bg-[#2C3339] p-7 text-[#FAF6F0] md:p-10">
+      <div className="absolute right-[-3rem] top-[-4rem] h-48 w-48 rounded-full border border-[#FAF6F0]/10" />
+      <div className="relative flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#A8B79A] text-sm font-bold text-[#2C3339]">{current.initials}</span>
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[.13em] text-[#A8B79A]">Shared with permission</p>
+            <p className="text-xs text-[#FAF6F0]/50">{current.detail}</p>
+          </div>
+        </div>
+        <div className="flex gap-1 text-[#C9A876]">
+          {[0, 1, 2, 3, 4].map((item) => (
+            <Star key={item} size={13} fill="currentColor" />
+          ))}
+        </div>
+      </div>
+      <motion.blockquote
+        key={current.initials}
+        initial={reduceMotion ? false : { opacity: 0, x: 16 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.45 }}
+        className="relative mt-12 max-w-[700px] font-serif text-[clamp(1.7rem,3.6vw,3rem)] leading-[1.2]"
+      >
+        “{current.text}”
+      </motion.blockquote>
+      <div className="relative mt-10 flex items-center justify-between border-t border-[#FAF6F0]/15 pt-5">
+        <div className="flex gap-2">
+          {testimonials.map((item, index) => (
+            <button
+              type="button"
+              key={item.initials}
+              onClick={() => setActive(index)}
+              aria-label={`Show testimonial ${index + 1}`}
+              data-testid={`button-testimonial-dot-${index}`}
+              className={`focus-ring h-2 rounded-full transition-all ${index === active ? 'w-8 bg-[#C9A876]' : 'w-2 bg-[#FAF6F0]/30'}`}
+            />
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setActive((active - 1 + testimonials.length) % testimonials.length)}
+            aria-label="Previous testimonial"
+            data-testid="button-testimonial-previous"
+            className="focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-[#FAF6F0]/20 hover:bg-[#FAF6F0]/10"
+          >
+            <ArrowRight className="rotate-180" size={16} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setActive((active + 1) % testimonials.length)}
+            aria-label="Next testimonial"
+            data-testid="button-testimonial-next"
+            className="focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-[#FAF6F0]/20 hover:bg-[#FAF6F0]/10"
+          >
+            <ArrowRight size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PricingSection() {
+  return (
+    <section className="border-t border-[#2C3339]/10 bg-[#FAF6F0] px-5 py-20 md:px-10 md:py-28" id="pricing">
+      <div className="section-wrap">
+        <div className="text-center">
+          <div className="eyebrow justify-center">Transparent & Simple</div>
+          <h2 className="display mx-auto mt-4 text-4xl leading-[1.05] text-[#2C3339] md:text-5xl">
+            Prices
+          </h2>
+          <p className="mx-auto mt-4 max-w-[520px] text-base leading-[1.75] text-[#2C3339]/65">
+            Clear fees with no hidden costs or lock-in contracts. Pay per individual session or choose a discounted three-session block.
+          </p>
+        </div>
+
+        <div className="mx-auto mt-12 max-w-[840px]">
+          <div className="relative grid items-stretch gap-6 md:grid-cols-[1fr_auto_1.15fr] md:gap-4">
+            {/* Single Session */}
+            <Reveal delay={0.05} className="h-full">
+              <div className="flex h-full flex-col justify-between rounded-[2rem] border border-[#2C3339]/15 bg-white/70 p-8 shadow-sm transition-all duration-300 hover:shadow-md">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold uppercase tracking-[.15em] text-[#7D6485]">Individual Session</span>
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#A8B79A]/25 text-[#2C3339]">
+                      <Clock3 size={15} />
+                    </span>
+                  </div>
+                  <div className="mt-6">
+                    <p className="display text-3xl font-semibold text-[#2C3339] md:text-4xl">
+                      £50 per session
+                    </p>
+                  </div>
+                  <p className="mt-4 text-sm leading-[1.7] text-[#2C3339]/70">
+                    A steady, 1-to-1 trauma-informed session focused on your immediate needs, safety, and regulation.
+                  </p>
+                </div>
+                <div className="mt-8 border-t border-[#2C3339]/10 pt-5">
+                  <Link
+                    href="/contact?package=single#appointment-request"
+                    className="focus-ring flex w-full items-center justify-center gap-2 rounded-xl bg-[#2C3339] py-3.5 text-xs font-bold uppercase tracking-[.12em] !text-[#FAF6F0] shadow-sm transition-transform hover:-translate-y-0.5 hover:bg-[#7D6485]"
+                  >
+                    <span className="!text-[#FAF6F0]">Book a session</span>
+                    <ArrowRight size={14} className="!text-[#FAF6F0]" />
+                  </Link>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* OR Divider */}
+            <div className="flex items-center justify-center py-2 md:py-0">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[#2C3339]/15 bg-[#FAF6F0] font-sans text-xs font-bold uppercase tracking-[.16em] text-[#7D6485] shadow-sm">
+                OR
+              </span>
+            </div>
+
+            {/* Block Booking */}
+            <Reveal delay={0.1} className="h-full">
+              <div className="relative flex h-full flex-col justify-between rounded-[2rem] bg-[#7D6485] p-8 text-[#FAF6F0] shadow-md transition-all duration-300 hover:shadow-xl">
+                <span className="absolute -top-3.5 right-6 rounded-full bg-[#C9A876] px-3.5 py-1 text-[10px] font-bold uppercase tracking-[.14em] text-[#2C3339] shadow-sm">
+                  Save £50
+                </span>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold uppercase tracking-[.15em] text-[#FAF6F0]/75">Special Offer</span>
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#FAF6F0]/15 text-[#FAF6F0]">
+                      <Sparkles size={15} />
+                    </span>
+                  </div>
+                  <div className="mt-6">
+                    <h3 className="display text-2xl font-bold leading-tight tracking-wide text-[#FAF6F0] md:text-3xl">
+                      BLOCK BOOK 3 X SESSIONS FOR £100!
+                    </h3>
+                  </div>
+                  <p className="mt-4 text-sm leading-[1.7] text-[#FAF6F0]/85">
+                    Recommended for establishing consistent continuity and pacing across your therapeutic journey.
+                  </p>
+                </div>
+                <div className="mt-8 border-t border-[#FAF6F0]/20 pt-5">
+                  <Link
+                    href="/contact?package=block#appointment-request"
+                    className="focus-ring flex w-full items-center justify-center gap-2 rounded-xl bg-[#A8B79A] py-3 text-xs font-bold uppercase tracking-[.12em] text-[#2C3339] transition-transform hover:-translate-y-0.5 hover:bg-[#FAF6F0]"
+                  >
+                    Request block booking <ArrowUpRight size={15} />
+                  </Link>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function HomePage() {
-  usePageMeta('A softer way forward', 'Trauma-informed therapy with Rebecca Dakin. A calm, private space to begin.');
+  usePageMeta('', 'Trauma-informed therapy and wellbeing support with Rebecca Dakin.');
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 700], [0, 110]);
-  return <SiteLayout>
-    <section className="relative min-h-[780px] overflow-hidden bg-[#FAF6F0] px-5 pb-24 pt-36 md:min-h-[860px] md:px-10 md:pt-48">
-      <motion.div style={{ y: heroY }} className="absolute right-[-12%] top-[-14%] h-[620px] w-[620px] rounded-full bg-[#7D6485]/12 blur-3xl" />
-      <div className="absolute bottom-[-180px] left-[-10%] h-[470px] w-[470px] rounded-full bg-[#A8B79A]/35 blur-3xl" />
-      <div className="section-wrap relative grid items-center gap-14 lg:grid-cols-[1.05fr_.95fr] lg:gap-20">
-        <Reveal><div className="eyebrow">A quiet place to start</div><h1 className="display mt-6 max-w-[700px] text-[clamp(3.45rem,7.4vw,6.7rem)] leading-[.96] text-[#2C3339]">You do not have to carry it <em className="text-[#7D6485]">alone.</em></h1><p className="mt-7 max-w-[560px] text-lg leading-[1.75] text-[#2C3339]/65 md:text-xl">Trauma-informed therapy for when life feels too loud, your body feels on alert, or you are tired of being told to simply move on.</p><div className="mt-9 flex flex-col items-start gap-5 sm:flex-row sm:items-center"><Link href="/contact" data-testid="link-hero-cta" className="focus-ring group flex items-center gap-3 rounded-full bg-[#2C3339] px-6 py-4 text-xs font-bold uppercase tracking-[.12em] !text-[#FAF6F0] transition-transform hover:-translate-y-1">Start with a conversation <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FAF6F0]/15 transition-transform group-hover:translate-x-1"><ArrowUpRight size={15} /></span></Link><Link href="/about" data-testid="link-hero-about" className="focus-ring line-link rounded-sm text-xs font-bold uppercase tracking-[.12em] text-[#7D6485]">See how I work</Link></div><div className="mt-12 flex items-center gap-3 text-xs text-[#2C3339]/55"><ShieldCheck size={16} className="text-[#7D6485]" /><span>A private, non-judgemental space. No pressure. No performance.</span></div></Reveal>
-        <Reveal delay={.12} className="relative mx-auto w-full max-w-[470px] lg:mr-6"><div className="absolute -left-8 top-10 z-10 hidden w-36 rounded-[1.2rem] border border-[#FAF6F0]/70 bg-[#FAF6F0]/85 p-4 shadow-xl backdrop-blur-md sm:block"><HeartHandshake size={17} className="mb-3 text-[#7D6485]" /><p className="font-serif text-[15px] leading-tight">You are in charge of your story.</p></div><div className="relative aspect-[.82] overflow-hidden rounded-[13rem_13rem_1.8rem_1.8rem] bg-[#A8B79A] shadow-[0_30px_80px_rgba(44,51,57,.18)]"><img src="/rebecca-studio.png" alt="Rebecca in a calm, light-filled therapy space" loading="eager" className="h-full w-full object-cover object-center opacity-90" /><div className="absolute inset-0 bg-gradient-to-t from-[#2C3339]/25 via-transparent to-[#7D6485]/10" /></div><div className="absolute -bottom-7 -right-5 flex h-32 w-32 rotate-[-9deg] flex-col items-center justify-center rounded-full bg-[#C9A876] text-center text-[#2C3339] shadow-lg sm:-right-12"><Sparkles size={17} strokeWidth={1.5} /><span className="mt-2 font-serif text-[17px] leading-none">A softer<br />way forward</span></div></Reveal>
-      </div>
-      <div className="absolute bottom-7 left-1/2 hidden -translate-x-1/2 items-center gap-3 text-[10px] font-bold uppercase tracking-[.2em] text-[#2C3339]/50 md:flex"><span className="h-8 w-px bg-[#7D6485]/45" /> Scroll gently</div>
-    </section>
-    <section className="border-y border-[#2C3339]/10 bg-[#A8B79A]/25 px-5 py-8 md:px-10"><div className="section-wrap grid gap-5 text-center sm:grid-cols-3 sm:text-left">{[['BACP registered', 'Ethical, accountable practice'], ['Trauma-informed', 'Thoughtful, grounded support'], ['Online + Bristol', 'A private space that fits you']].map(([title, copy]) => <div key={title} className="flex items-start justify-center gap-4 sm:justify-start"><Check size={17} className="mt-1 text-[#7D6485]" /><div><p className="font-serif text-lg">{title}</p><p className="mt-1 text-xs text-[#2C3339]/60">{copy}</p></div></div>)}</div></section>
-    <section className="bg-[#FAF6F0] px-5 py-24 md:px-10 md:py-32"><div className="section-wrap grid gap-12 lg:grid-cols-[.75fr_1.25fr] lg:items-center"><Reveal><div className="eyebrow">The heart of the work</div><p className="display mt-5 max-w-[360px] text-4xl leading-[1.1] text-[#2C3339] md:text-5xl">You are not a problem to solve.</p><DecorativeLotus className="mt-10 h-28 w-32 text-[#7D6485]/55" /></Reveal><Reveal delay={.1}><p className="max-w-[650px] font-serif text-[clamp(1.65rem,3.2vw,3rem)] leading-[1.28] text-[#2C3339]">This is therapy that makes room for the parts of you that are tired, guarded, angry, numb, or unsure. We begin with what feels manageable today, and let trust grow at its own pace.</p><Link href="/about" data-testid="link-home-approach" className="focus-ring line-link mt-8 inline-flex items-center gap-2 rounded-sm text-xs font-bold uppercase tracking-[.13em] text-[#7D6485]">Meet Rebecca <ArrowRight size={15} /></Link></Reveal></div></section>
-    <section className="home-services-section bg-[#2C3339] px-5 py-24 text-[#FAF6F0] md:px-10 md:py-32"><div className="section-wrap"><div className="flex flex-col justify-between gap-7 md:flex-row md:items-end"><div><div className="eyebrow !text-[#A8B79A]">Ways we can work</div><h2 className="display mt-5 max-w-[560px] text-5xl leading-[1.03] md:text-[4.8rem]">Support that meets you where you are.</h2></div><Link href="/services" data-testid="link-home-services" className="focus-ring line-link mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-[#A8B79A]">View all services <ArrowRight size={15} /></Link></div><div className="mt-14 grid gap-4 md:grid-cols-3">{services.slice(0, 3).map((service, index) => <ServiceCard key={service.title} service={service} index={index} onDarkSurface />)}</div></div></section>
-    <section className="bg-[#FAF6F0] px-5 py-24 md:px-10 md:py-32"><div className="section-wrap grid gap-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center"><Reveal><QuoteCard quote="For the first time, I did not feel like I had to convince someone that what happened mattered." cite="Client, 34" /></Reveal><Reveal delay={.1}><div className="lg:pl-10"><div className="eyebrow">A different kind of progress</div><h2 className="display mt-5 text-4xl leading-[1.08] md:text-5xl">Small steps can still take you somewhere new.</h2><p className="mt-6 max-w-[460px] leading-[1.8] text-[#2C3339]/65">You do not have to feel ready for everything. We focus on the next honest, kind step — whether that means understanding a pattern, practising a boundary, or simply staying with a feeling for a few seconds longer.</p></div></Reveal></div></section>
-    <section className="bg-[#7D6485]/18 px-5 py-24 md:px-10 md:py-32"><div className="section-wrap"><div className="flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><div className="eyebrow">Words from the room</div><h2 className="display mt-5 text-5xl leading-[1.04] md:text-[4.2rem]">You are allowed<br /><em className="text-[#7D6485]">to feel better.</em></h2></div><Link href="/testimonials" data-testid="link-home-testimonials" className="focus-ring line-link mb-2 text-xs font-bold uppercase tracking-[.13em] text-[#7D6485]">Read more stories <ArrowRight className="ml-2 inline" size={14} /></Link></div><div className="mt-12"><TestimonialCarousel /></div></div></section>
-    <section className="bg-[#FAF6F0] px-5 py-24 md:px-10 md:py-32"><div className="section-wrap"><div className="grid gap-8 md:grid-cols-[.8fr_1.2fr]"><div><div className="eyebrow">Your first step</div><h2 className="display mt-5 max-w-[410px] text-5xl leading-[1.04]">No leap of faith required.</h2></div><p className="max-w-[510px] text-lg leading-[1.8] text-[#2C3339]/65 md:pt-10">Starting therapy can feel like a lot. This is a small, clear beginning — with space to ask questions and decide in your own time.</p></div><div className="mt-14 grid gap-8 md:grid-cols-3">{[['01', 'Send a note', 'Tell me a little about what is bringing you here. You can keep it brief.'], ['02', 'Have a chat', 'We will have a relaxed 20-minute call to see how it feels to talk together.'], ['03', 'Choose your pace', 'If it feels right, we will agree a first session and a way of working that fits.']].map(([number, title, copy], index) => <Reveal key={number} delay={index * .08}><div className="border-t border-[#2C3339]/15 pt-5"><span className="font-serif text-xl italic text-[#7D6485]">{number}</span><h3 className="display mt-8 text-2xl">{title}</h3><p className="mt-3 max-w-[260px] text-sm leading-[1.75] text-[#2C3339]/65">{copy}</p></div></Reveal>)}</div></div></section>
-    <section className="relative overflow-hidden bg-[#A8B79A] px-5 py-24 text-[#2C3339] md:px-10 md:py-28"><DecorativeLotus className="absolute -right-3 top-4 h-64 w-64 rotate-12 text-[#2C3339]/15" /><div className="section-wrap relative"><div className="eyebrow !text-[#2C3339]/70">A conversation is enough for today</div><h2 className="display mt-5 max-w-[720px] text-5xl leading-[1.02] md:text-[5.5rem]">You can start softly.</h2><p className="mt-7 max-w-[480px] text-lg leading-[1.75] text-[#2C3339]/70">Bring the uncertainty, the scepticism, the part of you that is still waiting to see if this feels safe.</p><Link href="/contact" data-testid="link-home-final-cta" className="focus-ring mt-8 inline-flex items-center gap-3 rounded-full bg-[#2C3339] px-6 py-4 text-xs font-bold uppercase tracking-[.12em] text-[#FAF6F0] transition-transform hover:-translate-y-1">Book a gentle chat <ArrowUpRight size={16} /></Link></div></section>
-  </SiteLayout>;
+
+  return (
+    <SiteLayout>
+      {/* Hero Section */}
+      <section className="relative min-h-[780px] overflow-hidden bg-[#FAF6F0] px-5 pb-24 pt-36 md:min-h-[860px] md:px-10 md:pt-48">
+        <motion.div style={{ y: heroY }} className="absolute right-[-12%] top-[-14%] h-[620px] w-[620px] rounded-full bg-[#7D6485]/12 blur-3xl" />
+        <div className="absolute bottom-[-180px] left-[-10%] h-[470px] w-[470px] rounded-full bg-[#A8B79A]/35 blur-3xl" />
+        <div className="section-wrap relative grid items-center gap-14 lg:grid-cols-[1.05fr_.95fr] lg:gap-20">
+          <Reveal>
+            <div className="eyebrow">A quiet place to start</div>
+            <h1 className="display mt-6 max-w-[700px] text-[clamp(3.45rem,7.4vw,6.7rem)] leading-[.96] text-[#2C3339]">
+              You do not have to carry it <em className="text-[#7D6485]">alone.</em>
+            </h1>
+            <p className="mt-7 max-w-[560px] text-lg leading-[1.75] text-[#2C3339]/65 md:text-xl">
+              Trauma-informed therapy for when life feels too loud, your body feels on alert, or you are tired of being told to simply move on.
+            </p>
+
+            {/* Therapy Focus Callout */}
+            <div className="mt-6 max-w-[560px] rounded-2xl border border-[#7D6485]/20 bg-[#7D6485]/10 p-4 text-xs leading-[1.7] text-[#2C3339]/80">
+              <span className="font-bold uppercase tracking-[.12em] text-[#7D6485]">Therapy Focus: </span>
+              {therapyFocus.headline}
+            </div>
+
+            <div className="mt-8 flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+              <Link
+                href="/contact"
+                data-testid="link-hero-cta"
+                className="focus-ring group flex items-center gap-3 rounded-full bg-[#2C3339] px-6 py-4 text-xs font-bold uppercase tracking-[.12em] !text-[#FAF6F0] transition-transform hover:-translate-y-1"
+              >
+                Start with a conversation{' '}
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FAF6F0]/15 transition-transform group-hover:translate-x-1">
+                  <ArrowUpRight size={15} />
+                </span>
+              </Link>
+              <Link href="/about" data-testid="link-hero-about" className="focus-ring line-link rounded-sm text-xs font-bold uppercase tracking-[.12em] text-[#7D6485]">
+                See how I work
+              </Link>
+            </div>
+            <div className="mt-10 flex items-center gap-3 text-xs text-[#2C3339]/55">
+              <ShieldCheck size={16} className="text-[#7D6485]" />
+              <span>A private, non-judgemental space. No pressure. No performance.</span>
+            </div>
+          </Reveal>
+          <Reveal delay={0.12} className="relative mx-auto w-full max-w-[470px] lg:mr-6">
+            <div className="absolute -left-8 top-10 z-10 hidden w-36 rounded-[1.2rem] border border-[#FAF6F0]/70 bg-[#FAF6F0]/85 p-4 shadow-xl backdrop-blur-md sm:block">
+              <HeartHandshake size={17} className="mb-3 text-[#7D6485]" />
+              <p className="font-serif text-[15px] leading-tight">You are in charge of your story.</p>
+            </div>
+            <div className="relative aspect-[.82] overflow-hidden rounded-[13rem_13rem_1.8rem_1.8rem] bg-[#A8B79A] shadow-[0_30px_80px_rgba(44,51,57,.18)]">
+              <img src="/rebecca-studio.png" alt="Rebecca in a calm, light-filled therapy space" loading="eager" className="h-full w-full object-cover object-center opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#2C3339]/25 via-transparent to-[#7D6485]/10" />
+            </div>
+            <div className="absolute -bottom-7 -right-5 flex h-32 w-32 rotate-[-9deg] flex-col items-center justify-center rounded-full bg-[#C9A876] text-center text-[#2C3339] shadow-lg sm:-right-12">
+              <Sparkles size={17} strokeWidth={1.5} />
+              <span className="mt-2 font-serif text-[17px] leading-none">
+                A softer
+                <br />
+                way forward
+              </span>
+            </div>
+          </Reveal>
+        </div>
+        <div className="absolute bottom-7 left-1/2 hidden -translate-x-1/2 items-center gap-3 text-[10px] font-bold uppercase tracking-[.2em] text-[#2C3339]/50 md:flex">
+          <span className="h-8 w-px bg-[#7D6485]/45" /> Scroll gently
+        </div>
+      </section>
+
+      {/* Trust & Accreditations bar */}
+      <section className="border-y border-[#2C3339]/10 bg-[#A8B79A]/25 px-5 py-8 md:px-10">
+        <div className="section-wrap grid gap-5 text-center sm:grid-cols-3 sm:text-left">
+          {[
+            ['BACP registered', 'Ethical, accountable practice'],
+            ['Trauma-informed', 'Thoughtful, grounded support'],
+            ['Online + Bristol', 'A private space that fits you'],
+          ].map(([title, copy]) => (
+            <div key={title} className="flex items-start justify-center gap-4 sm:justify-start">
+              <Check size={17} className="mt-1 text-[#7D6485]" />
+              <div>
+                <p className="font-serif text-lg">{title}</p>
+                <p className="mt-1 text-xs text-[#2C3339]/60">{copy}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* The Heart of the Work */}
+      <section className="bg-[#FAF6F0] px-5 py-24 md:px-10 md:py-32">
+        <div className="section-wrap grid gap-12 lg:grid-cols-[.75fr_1.25fr] lg:items-center">
+          <Reveal>
+            <div className="eyebrow">The heart of the work</div>
+            <p className="display mt-5 max-w-[360px] text-4xl leading-[1.1] text-[#2C3339] md:text-5xl">You are not a problem to solve.</p>
+            <DecorativeLotus className="mt-10 h-28 w-32 text-[#7D6485]/55" />
+          </Reveal>
+          <Reveal delay={0.1}>
+            <p className="max-w-[650px] font-serif text-[clamp(1.65rem,3.2vw,3rem)] leading-[1.28] text-[#2C3339]">
+              This is therapy that makes room for the parts of you that are tired, guarded, angry, numb, or unsure. We begin with what feels manageable today, and let trust grow at its own pace.
+            </p>
+            <Link href="/about" data-testid="link-home-approach" className="focus-ring line-link mt-8 inline-flex items-center gap-2 rounded-sm text-xs font-bold uppercase tracking-[.13em] text-[#7D6485]">
+              Meet Rebecca <ArrowRight size={15} />
+            </Link>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Healing Message Banner */}
+      <section className="relative overflow-hidden bg-[#7D6485] px-5 py-20 text-[#FAF6F0] md:px-10 md:py-28">
+        <div className="absolute right-[-6%] top-[-10%] h-[380px] w-[380px] rounded-full bg-[#FAF6F0]/5 blur-2xl" />
+        <DecorativeLotus className="absolute -left-6 bottom-0 h-44 w-44 text-[#FAF6F0]/10" />
+        <div className="section-wrap relative text-center">
+          <Reveal>
+            <div className="eyebrow justify-center !text-[#C9A876]">A message of hope & recovery</div>
+            <h2 className="display mx-auto mt-6 max-w-[880px] text-3xl leading-[1.15] md:text-5xl lg:text-[3.3rem]">
+              “{therapyFocus.messagePrimary}”
+            </h2>
+            <p className="mx-auto mt-6 max-w-[640px] font-serif text-xl italic text-[#A8B79A] md:text-2xl">
+              {therapyFocus.messageSecondary}
+            </p>
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-5">
+              <Link
+                href="/contact"
+                data-testid="link-home-healing-cta"
+                className="focus-ring inline-flex items-center gap-2.5 rounded-full bg-[#FAF6F0] px-7 py-4 text-xs font-bold uppercase tracking-[.12em] !text-[#2C3339] shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-xl"
+              >
+                <span className="font-bold !text-[#2C3339]">Begin your healing journey</span>
+                <ArrowRight size={15} className="!text-[#2C3339]" />
+              </Link>
+              <Link
+                href="/services#specialisations"
+                className="focus-ring line-link inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.12em] !text-[#FAF6F0]"
+              >
+                View specialisations <ArrowUpRight size={14} className="!text-[#FAF6F0]" />
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Specialisations Section */}
+      <section className="bg-[#FAF6F0] px-5 py-24 md:px-10 md:py-32" id="specialisations">
+        <div className="section-wrap">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div>
+              <div className="eyebrow">Focused Clinical Practice</div>
+              <h2 className="display mt-5 max-w-[640px] text-4xl leading-[1.05] md:text-5xl">
+                Specialisations for deep healing.
+              </h2>
+            </div>
+            <p className="max-w-[420px] text-sm leading-[1.75] text-[#2C3339]/65">
+              Dedicated therapeutic support for the specific relational dynamics and nervous system responses that keep you stuck in survival mode.
+            </p>
+          </div>
+          <div className="mt-14 grid gap-6 md:grid-cols-3">
+            {specialisations.map((item, index) => (
+              <Reveal key={item.title} delay={index * 0.08}>
+                <div className={`flex h-full flex-col justify-between rounded-[2rem] border border-[#2C3339]/10 p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${item.accent}`}>
+                  <div>
+                    <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FAF6F0]/80 text-[#7D6485]">
+                      <item.icon size={22} strokeWidth={1.5} />
+                    </span>
+                    <h3 className="display mt-6 text-2xl leading-tight text-[#2C3339]">{item.title}</h3>
+                    <p className="mt-3 text-sm font-medium leading-[1.7] text-[#2C3339]/75">{item.summary}</p>
+                    <p className="mt-4 border-t border-[#2C3339]/10 pt-4 text-xs leading-[1.75] text-[#2C3339]/65">{item.detail}</p>
+                  </div>
+                  <div className="mt-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.12em] text-[#7D6485]">
+                    <Check size={14} /> Compassionate & tailored
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="home-services-section bg-[#2C3339] px-5 py-24 text-[#FAF6F0] md:px-10 md:py-32">
+        <div className="section-wrap">
+          <div className="flex flex-col justify-between gap-7 md:flex-row md:items-end">
+            <div>
+              <div className="eyebrow !text-[#A8B79A]">Ways we can work</div>
+              <h2 className="display mt-5 max-w-[560px] text-5xl leading-[1.03] md:text-[4.8rem]">Support that meets you where you are.</h2>
+            </div>
+            <Link href="/services" data-testid="link-home-services" className="focus-ring line-link mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-[#A8B79A]">
+              View all services <ArrowRight size={15} />
+            </Link>
+          </div>
+          <div className="mt-14 grid gap-4 md:grid-cols-3">
+            {services.slice(0, 3).map((service, index) => (
+              <ServiceCard key={service.title} service={service} index={index} onDarkSurface />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Quote & Progress */}
+      <section className="bg-[#FAF6F0] px-5 py-24 md:px-10 md:py-32">
+        <div className="section-wrap grid gap-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
+          <Reveal>
+            <QuoteCard quote="For the first time, I did not feel like I had to convince someone that what happened mattered." cite="Client, 34" />
+          </Reveal>
+          <Reveal delay={0.1}>
+            <div className="lg:pl-10">
+              <div className="eyebrow">A different kind of progress</div>
+              <h2 className="display mt-5 text-4xl leading-[1.08] md:text-5xl">Small steps can still take you somewhere new.</h2>
+              <p className="mt-6 max-w-[460px] leading-[1.8] text-[#2C3339]/65">
+                You do not have to feel ready for everything. We focus on the next honest, kind step — whether that means understanding a pattern, practising a boundary, or simply staying with a feeling for a few seconds longer.
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="bg-[#7D6485]/18 px-5 py-24 md:px-10 md:py-32">
+        <div className="section-wrap">
+          <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+            <div>
+              <div className="eyebrow">Words from the room</div>
+              <h2 className="display mt-5 text-5xl leading-[1.04] md:text-[4.2rem]">
+                You are allowed
+                <br />
+                <em className="text-[#7D6485]">to feel better.</em>
+              </h2>
+            </div>
+            <Link href="/testimonials" data-testid="link-home-testimonials" className="focus-ring line-link mb-2 text-xs font-bold uppercase tracking-[.13em] text-[#7D6485]">
+              Read more stories <ArrowRight className="ml-2 inline" size={14} />
+            </Link>
+          </div>
+          <div className="mt-12">
+            <TestimonialCarousel />
+          </div>
+        </div>
+      </section>
+
+      {/* Steps to Begin */}
+      <section className="bg-[#FAF6F0] px-5 py-24 md:px-10 md:py-32">
+        <div className="section-wrap">
+          <div className="grid gap-8 md:grid-cols-[.8fr_1.2fr]">
+            <div>
+              <div className="eyebrow">Your first step</div>
+              <h2 className="display mt-5 max-w-[410px] text-5xl leading-[1.04]">No leap of faith required.</h2>
+            </div>
+            <p className="max-w-[510px] text-lg leading-[1.8] text-[#2C3339]/65 md:pt-10">Starting therapy can feel like a lot. This is a small, clear beginning — with space to ask questions and decide in your own time.</p>
+          </div>
+          <div className="mt-14 grid gap-8 md:grid-cols-3">
+            {[
+              ['01', 'Send a note', 'Tell me a little about what is bringing you here. You can keep it brief.'],
+              ['02', 'Have a chat', 'We will have a relaxed 20-minute call to see how it feels to talk together.'],
+              ['03', 'Choose your pace', 'If it feels right, we will agree a first session and a way of working that fits.'],
+            ].map(([number, title, copy], index) => (
+              <Reveal key={number} delay={index * 0.08}>
+                <div className="border-t border-[#2C3339]/15 pt-5">
+                  <span className="font-serif text-xl italic text-[#7D6485]">{number}</span>
+                  <h3 className="display mt-8 text-2xl">{title}</h3>
+                  <p className="mt-3 max-w-[260px] text-sm leading-[1.75] text-[#2C3339]/65">{copy}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <PricingSection />
+
+      {/* Gentle Closing CTA */}
+      <section className="relative overflow-hidden bg-[#A8B79A] px-5 py-24 text-[#2C3339] md:px-10 md:py-28">
+        <DecorativeLotus className="absolute -right-3 top-4 h-64 w-64 rotate-12 text-[#2C3339]/15" />
+        <div className="section-wrap relative">
+          <div className="eyebrow !text-[#2C3339]/70">A conversation is enough for today</div>
+          <h2 className="display mt-5 max-w-[720px] text-5xl leading-[1.02] md:text-[5.5rem]">You can start softly.</h2>
+          <p className="mt-7 max-w-[480px] text-lg leading-[1.75] text-[#2C3339]/70">
+            Bring the uncertainty, the scepticism, the part of you that is still waiting to see if this feels safe.
+          </p>
+          <Link
+            href="/contact"
+            data-testid="link-home-final-cta"
+            className="focus-ring mt-8 inline-flex items-center gap-3 rounded-full bg-[#2C3339] px-6 py-4 text-xs font-bold uppercase tracking-[.12em] text-[#FAF6F0] transition-transform hover:-translate-y-1"
+          >
+            Book a gentle chat <ArrowUpRight size={16} />
+          </Link>
+        </div>
+      </section>
+    </SiteLayout>
+  );
 }
 
 function AboutPage() {
   usePageMeta('About Rebecca', 'Meet Rebecca Dakin and learn about the trauma-informed, collaborative approach behind RD Trauma Healing.');
   const [videoOpen, setVideoOpen] = useState(false);
-  return <SiteLayout><PageIntro label="About Rebecca" title={<>Therapy that begins with <em className="text-[#7D6485]">trust.</em></>} description="A little about the person behind the practice, the way I work, and why a safe relationship matters before anything else." /><section className="bg-[#FAF6F0] px-5 pb-24 md:px-10 md:pb-36"><div className="section-wrap grid gap-14 lg:grid-cols-[.8fr_1.2fr] lg:items-start"><Reveal className="relative"><div className="absolute -left-5 -top-7 h-24 w-24 rounded-full border border-[#C9A876]" /><div className="relative overflow-hidden rounded-[2rem] bg-[#A8B79A]/55 p-7 pb-0 md:p-10 md:pb-0"><div className="relative aspect-[.87] overflow-hidden rounded-t-[10rem] bg-[#7D6485]"><img src="/rebecca-studio.png" loading="lazy" alt="Rebecca Dakin, founder of RD Trauma Healing" className="h-full w-full object-cover object-center opacity-90" /></div><div className="relative -mt-7 ml-auto w-fit rounded-2xl bg-[#FAF6F0] px-5 py-4 shadow-lg"><p className="font-serif text-lg">Rebecca Dakin</p><p className="mt-1 text-[10px] uppercase tracking-[.15em] text-[#2C3339]/55">Trauma-informed therapist</p></div></div></Reveal><Reveal delay={.1}><div className="eyebrow">A human before a title</div><h2 className="display mt-5 text-4xl leading-[1.06] md:text-5xl">You will never have to perform “being okay” here.</h2><div className="mt-8 space-y-5 text-[16px] leading-[1.85] text-[#2C3339]/68"><p>I am Rebecca, a trauma-informed therapist based in Bristol. I work with adults who have been carrying difficult experiences, anxious thoughts, relationship patterns, or a sense of disconnection for longer than they ever expected.</p><p>My own curiosity about therapy began with the same question many people bring to me: why can I understand what happened and still feel stuck in it? Training gave me tools, but the therapy room taught me that relationship, pacing, and genuine respect are just as important.</p><p>I believe you are the expert in your experience. My role is to offer steadiness, thoughtful questions, and evidence-led approaches that help you understand your responses and build more choice.</p></div><div className="mt-9 grid gap-4 border-t border-[#2C3339]/12 pt-7 sm:grid-cols-2"><div><p className="font-serif text-lg">Qualifications</p><p className="mt-2 text-sm leading-[1.7] text-[#2C3339]/60">BSc Psychology · Postgraduate Diploma in Integrative Counselling · BACP Registered</p></div><div><p className="font-serif text-lg">How I practise</p><p className="mt-2 text-sm leading-[1.7] text-[#2C3339]/60">Trauma-informed · relational · neurodiversity-aware · LGBTQ+ affirming</p></div></div></Reveal></div></section><section className="bg-[#2C3339] px-5 py-24 text-[#FAF6F0] md:px-10 md:py-32"><div className="section-wrap grid gap-10 lg:grid-cols-[1.1fr_.9fr] lg:items-center"><Reveal><QuoteCard dark quote="Safety is not a finish line. It is something we can notice, practise, and return to together." cite="Rebecca Dakin" /></Reveal><Reveal delay={.1}><div className="relative flex aspect-video items-center justify-center overflow-hidden rounded-[2rem] border border-[#FAF6F0]/15 bg-[#7D6485]/40"><div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_35%,rgba(201,168,118,.25),transparent_32%)]" /><button type="button" onClick={() => setVideoOpen((open) => !open)} aria-expanded={videoOpen} data-testid="button-video-placeholder" className="focus-ring relative flex h-16 w-16 items-center justify-center rounded-full bg-[#FAF6F0] text-[#7D6485] shadow-xl transition-transform hover:scale-105">{videoOpen ? <Check size={22} /> : <Play size={22} fill="currentColor" />}</button><span className="absolute bottom-5 left-5 text-[10px] font-bold uppercase tracking-[.15em] text-[#FAF6F0]/55">{videoOpen ? 'Video placeholder selected · replace at launch' : 'A note from Rebecca · video placeholder'}</span></div></Reveal></div></section><section className="bg-[#FAF6F0] px-5 py-24 md:px-10 md:py-32"><div className="section-wrap text-center"><div className="eyebrow justify-center">The promise of this practice</div><p className="display mx-auto mt-6 max-w-[850px] text-4xl leading-[1.12] md:text-6xl">“You do not need to arrive with the right words. We can find them together.”</p><Link href="/contact" data-testid="link-about-contact" className="focus-ring mt-9 inline-flex items-center gap-2 rounded-full border border-[#7D6485] px-6 py-3 text-xs font-bold uppercase tracking-[.12em] text-[#7D6485] transition-colors hover:bg-[#7D6485] hover:text-[#FAF6F0]">Start a conversation <ArrowRight size={15} /></Link></div></section></SiteLayout>;
+
+  return (
+    <SiteLayout>
+      <PageIntro
+        label="About Rebecca"
+        title={
+          <>
+            Therapy that begins with <em className="text-[#7D6485]">trust.</em>
+          </>
+        }
+        description="A little about the person behind the practice, the way I work, and why a safe relationship matters before anything else."
+      />
+
+      {/* Main Bio Section */}
+      <section className="bg-[#FAF6F0] px-5 pb-24 md:px-10 md:pb-36">
+        <div className="section-wrap grid gap-14 lg:grid-cols-[.8fr_1.2fr] lg:items-start">
+          <Reveal className="relative">
+            <div className="absolute -left-5 -top-7 h-24 w-24 rounded-full border border-[#C9A876]" />
+            <div className="relative overflow-hidden rounded-[2rem] bg-[#A8B79A]/55 p-7 pb-0 md:p-10 md:pb-0">
+              <div className="relative aspect-[.87] overflow-hidden rounded-t-[10rem] bg-[#7D6485]">
+                <img src="/rebecca-studio.png" loading="lazy" alt="Rebecca Dakin, founder of RD Trauma Healing" className="h-full w-full object-cover object-center opacity-90" />
+              </div>
+              <div className="relative -mt-7 ml-auto w-fit rounded-2xl bg-[#FAF6F0] px-5 py-4 shadow-lg">
+                <p className="font-serif text-lg">Rebecca Dakin</p>
+                <p className="mt-1 text-[10px] uppercase tracking-[.15em] text-[#2C3339]/55">Trauma-informed therapist</p>
+              </div>
+            </div>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <div className="eyebrow">A human before a title</div>
+            <h2 className="display mt-5 text-4xl leading-[1.06] md:text-5xl">You will never have to perform “being okay” here.</h2>
+            <div className="mt-8 space-y-5 text-[16px] leading-[1.85] text-[#2C3339]/68">
+              <p>
+                I am Rebecca, a trauma-informed therapist based in Bristol. I work with adults who have been carrying difficult experiences, anxious thoughts, relationship patterns, or a sense of disconnection for longer than they ever expected.
+              </p>
+              <p>
+                My own curiosity about therapy began with the same question many people bring to me: why can I understand what happened and still feel stuck in it? Training gave me tools, but the therapy room taught me that relationship, pacing, and genuine respect are just as important.
+              </p>
+              <p>
+                I believe you are the expert in your experience. My role is to offer steadiness, thoughtful questions, and evidence-led approaches that help you understand your responses and build more choice.
+              </p>
+            </div>
+
+            <div className="mt-9 grid gap-6 border-t border-[#2C3339]/12 pt-7 sm:grid-cols-2">
+              <div>
+                <p className="font-serif text-lg">Qualifications</p>
+                <p className="mt-2 text-sm leading-[1.7] text-[#2C3339]/60">BSc Psychology · Postgraduate Diploma in Integrative Counselling · BACP Registered</p>
+              </div>
+              <div>
+                <p className="font-serif text-lg">How I practise</p>
+                <p className="mt-2 text-sm leading-[1.7] text-[#2C3339]/60">Trauma-informed · relational · neurodiversity-aware · LGBTQ+ affirming</p>
+              </div>
+              <div>
+                <p className="font-serif text-lg">Therapy Focus</p>
+                <p className="mt-2 text-sm leading-[1.7] text-[#2C3339]/60">
+                  {therapyFocus.headline}
+                </p>
+              </div>
+              <div>
+                <p className="font-serif text-lg">Specialisations</p>
+                <p className="mt-2 text-sm leading-[1.7] text-[#2C3339]/60">
+                  Attachment styles · Rejection sensitivity · Relationship hyper-vigilance
+                </p>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Core Values Section */}
+      <section className="border-t border-[#2C3339]/10 bg-[#FAF6F0] px-5 py-24 md:px-10 md:py-32" id="core-values">
+        <div className="section-wrap">
+          <div className="text-center">
+            <div className="eyebrow justify-center">Guiding Principles</div>
+            <h2 className="display mx-auto mt-4 max-w-[620px] text-4xl leading-[1.05] md:text-5xl">
+              Our Core Values
+            </h2>
+            <p className="mx-auto mt-4 max-w-[540px] text-base leading-[1.75] text-[#2C3339]/65">
+              These fundamental commitments guide every interaction, session, and therapeutic plan we create together.
+            </p>
+          </div>
+          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {coreValues.map((val, index) => (
+              <Reveal key={val.name} delay={index * 0.08}>
+                <div className="flex h-full flex-col justify-between rounded-[2rem] border border-[#2C3339]/10 bg-[#FAF6F0] p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#A8B79A]/30 text-[#7D6485]">
+                        <val.icon size={20} strokeWidth={1.5} />
+                      </span>
+                      <span className="text-[10px] font-bold uppercase tracking-[.15em] text-[#C9A876]">{val.tag}</span>
+                    </div>
+                    <h3 className="display mt-6 text-2xl text-[#2C3339]">{val.name}</h3>
+                    <p className="mt-3 text-sm leading-[1.75] text-[#2C3339]/65">{val.description}</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Quote & Video Placeholder */}
+      <section className="bg-[#2C3339] px-5 py-24 text-[#FAF6F0] md:px-10 md:py-32">
+        <div className="section-wrap grid gap-10 lg:grid-cols-[1.1fr_.9fr] lg:items-center">
+          <Reveal>
+            <QuoteCard dark quote="Safety is not a finish line. It is something we can notice, practise, and return to together." cite="Rebecca Dakin" />
+          </Reveal>
+          <Reveal delay={0.1}>
+            <div className="relative flex aspect-video items-center justify-center overflow-hidden rounded-[2rem] border border-[#FAF6F0]/15 bg-[#7D6485]/40">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_35%,rgba(201,168,118,.25),transparent_32%)]" />
+              <button
+                type="button"
+                onClick={() => setVideoOpen((open) => !open)}
+                aria-expanded={videoOpen}
+                data-testid="button-video-placeholder"
+                className="focus-ring relative flex h-16 w-16 items-center justify-center rounded-full bg-[#FAF6F0] text-[#7D6485] shadow-xl transition-transform hover:scale-105"
+              >
+                {videoOpen ? <Check size={22} /> : <Play size={22} fill="currentColor" />}
+              </button>
+              <span className="absolute bottom-5 left-5 text-[10px] font-bold uppercase tracking-[.15em] text-[#FAF6F0]/55">
+                {videoOpen ? 'Video placeholder selected · replace at launch' : 'A note from Rebecca · video placeholder'}
+              </span>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Promise & Healing Message */}
+      <section className="bg-[#FAF6F0] px-5 py-24 md:px-10 md:py-32">
+        <div className="section-wrap text-center">
+          <div className="eyebrow justify-center">The promise of this practice</div>
+          <p className="display mx-auto mt-6 max-w-[850px] text-3xl leading-[1.15] md:text-5xl lg:text-[3.5rem]">
+            “{therapyFocus.messagePrimary}”
+          </p>
+          <p className="mx-auto mt-4 max-w-[620px] font-serif text-xl italic text-[#7D6485] md:text-2xl">
+            {therapyFocus.messageSecondary}
+          </p>
+          <Link
+            href="/contact"
+            data-testid="link-about-contact"
+            className="focus-ring mt-9 inline-flex items-center gap-2 rounded-full border border-[#7D6485] px-6 py-3 text-xs font-bold uppercase tracking-[.12em] text-[#7D6485] transition-colors hover:bg-[#7D6485] hover:text-[#FAF6F0]"
+          >
+            Start a conversation <ArrowRight size={15} />
+          </Link>
+        </div>
+      </section>
+    </SiteLayout>
+  );
 }
 
 function ServicesPage() {
   usePageMeta('Services', 'Explore trauma-informed therapy, somatic support, and other ways to work with Rebecca.');
-  return <SiteLayout><PageIntro label="Ways we can work" title={<>Support with room to <em className="text-[#7D6485]">breathe.</em></>} description="There is no gold star for choosing the hardest route. We will choose the approach that helps you feel safe enough to be honest, and supported enough to change." /><section className="bg-[#FAF6F0] px-5 pb-24 md:px-10 md:pb-36"><div className="section-wrap grid gap-4 md:grid-cols-2 lg:grid-cols-3">{services.map((service, index) => <ServiceCard key={service.title} service={service} index={index} />)}</div><div className="mt-12 flex items-start gap-4 rounded-2xl border border-[#2C3339]/10 bg-[#A8B79A]/20 p-5 text-sm leading-[1.7] text-[#2C3339]/68"><ShieldCheck className="mt-1 shrink-0 text-[#7D6485]" size={20} /> We will always talk about what feels safe and appropriate before beginning any therapy. You can ask questions about any approach without needing to make a decision.</div></section><section className="bg-[#7D6485]/18 px-5 py-24 md:px-10"><div className="section-wrap flex flex-col justify-between gap-8 md:flex-row md:items-center"><div><div className="eyebrow">Not sure what fits?</div><h2 className="display mt-4 max-w-[560px] text-4xl leading-[1.06] md:text-5xl">You do not need to choose before we talk.</h2></div><Link href="/contact" data-testid="link-services-contact" className="focus-ring flex w-fit items-center gap-3 rounded-full bg-[#2C3339] px-6 py-4 text-xs font-bold uppercase tracking-[.12em] text-[#FAF6F0] hover:-translate-y-0.5">Ask a question <ArrowUpRight size={16} /></Link></div></section></SiteLayout>;
+
+  return (
+    <SiteLayout>
+      <PageIntro
+        label="Ways we can work"
+        title={
+          <>
+            Support with room to <em className="text-[#7D6485]">breathe.</em>
+          </>
+        }
+        description="There is no gold star for choosing the hardest route. We will choose the approach that helps you feel safe enough to be honest, and supported enough to change."
+      />
+
+      {/* Therapy Focus & Healing Banner */}
+      <section className="border-b border-[#2C3339]/10 bg-[#A8B79A]/20 px-5 py-12 md:px-10">
+        <div className="section-wrap grid items-center gap-8 lg:grid-cols-[1.1fr_.9fr]">
+          <div>
+            <div className="eyebrow">Therapy Focus</div>
+            <h2 className="display mt-3 text-2xl leading-snug text-[#2C3339] md:text-3xl">
+              {therapyFocus.headline}
+            </h2>
+          </div>
+          <div className="rounded-2xl border border-[#2C3339]/10 bg-[#FAF6F0] p-6 shadow-sm">
+            <p className="font-serif text-lg leading-snug text-[#7D6485]">
+              “{therapyFocus.messagePrimary}”
+            </p>
+            <p className="mt-2 text-sm italic text-[#2C3339]/65">
+              {therapyFocus.messageSecondary}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Primary Services Grid */}
+      <section className="bg-[#FAF6F0] px-5 pb-20 pt-16 md:px-10 md:pb-28">
+        <div className="section-wrap">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {services.map((service, index) => (
+              <ServiceCard key={service.title} service={service} index={index} />
+            ))}
+          </div>
+          <div className="mt-12 flex items-start gap-4 rounded-2xl border border-[#2C3339]/10 bg-[#A8B79A]/20 p-5 text-sm leading-[1.7] text-[#2C3339]/68">
+            <ShieldCheck className="mt-1 shrink-0 text-[#7D6485]" size={20} />
+            We will always talk about what feels safe and appropriate before beginning any therapy. You can ask questions about any approach without needing to make a decision.
+          </div>
+        </div>
+      </section>
+
+      {/* Dedicated Specialisations Section */}
+      <section className="border-t border-[#2C3339]/10 bg-[#FAF6F0] px-5 py-24 md:px-10 md:py-32" id="specialisations">
+        <div className="section-wrap">
+          <div className="text-center">
+            <div className="eyebrow justify-center">Targeted Relational & Nervous System Support</div>
+            <h2 className="display mx-auto mt-4 max-w-[650px] text-4xl leading-[1.05] md:text-5xl">
+              Areas of Specialisation
+            </h2>
+            <p className="mx-auto mt-4 max-w-[560px] text-base leading-[1.75] text-[#2C3339]/65">
+              Targeted, compassionate approaches for people healing from complex relational trauma, survival mode, and emotional fatigue.
+            </p>
+          </div>
+          <div className="mt-14 grid gap-6 md:grid-cols-3">
+            {specialisations.map((spec, index) => (
+              <Reveal key={spec.title} delay={index * 0.08}>
+                <article className={`flex h-full flex-col justify-between rounded-[2rem] border border-[#2C3339]/10 p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${spec.accent}`}>
+                  <div>
+                    <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FAF6F0]/80 text-[#7D6485]">
+                      <spec.icon size={22} strokeWidth={1.5} />
+                    </span>
+                    <h3 className="display mt-6 text-2xl leading-tight text-[#2C3339]">{spec.title}</h3>
+                    <p className="mt-3 text-sm font-medium leading-[1.7] text-[#2C3339]/75">{spec.summary}</p>
+                    <p className="mt-4 border-t border-[#2C3339]/10 pt-4 text-xs leading-[1.8] text-[#2C3339]/65">{spec.detail}</p>
+                  </div>
+                  <div className="mt-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.12em] text-[#7D6485]">
+                    <Check size={14} /> Evidence-led & trauma-informed
+                  </div>
+                </article>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <PricingSection />
+
+      {/* CTA Section */}
+      <section className="bg-[#7D6485]/18 px-5 py-24 md:px-10">
+        <div className="section-wrap flex flex-col justify-between gap-8 md:flex-row md:items-center">
+          <div>
+            <div className="eyebrow">Not sure what fits?</div>
+            <h2 className="display mt-4 max-w-[560px] text-4xl leading-[1.06] md:text-5xl">You do not need to choose before we talk.</h2>
+          </div>
+          <Link
+            href="/contact"
+            data-testid="link-services-contact"
+            className="focus-ring flex w-fit items-center gap-3 rounded-full bg-[#2C3339] px-6 py-4 text-xs font-bold uppercase tracking-[.12em] text-[#FAF6F0] hover:-translate-y-0.5"
+          >
+            Ask a question <ArrowUpRight size={16} />
+          </Link>
+        </div>
+      </section>
+    </SiteLayout>
+  );
 }
 
 function TestimonialsPage() {
   usePageMeta('Testimonials', 'Read anonymous reflections from people who have worked with RD Trauma Healing.');
-  return <SiteLayout><PageIntro label="Words from the room" title={<>You are allowed to feel <em className="text-[#7D6485]">better.</em></>} description="Shared with permission. Names and details have been changed to protect privacy. Every person’s process is different." /><section className="bg-[#FAF6F0] px-5 pb-24 md:px-10 md:pb-36"><div className="section-wrap grid gap-5 md:grid-cols-2">{testimonials.map((item, index) => <Reveal key={item.initials} delay={index * .06}><article className={`flex min-h-[310px] flex-col justify-between rounded-[2rem] p-7 md:p-9 ${index % 3 === 0 ? 'bg-[#A8B79A]/45' : index % 3 === 1 ? 'bg-[#7D6485] text-[#FAF6F0]' : 'bg-[#C9A876]/35'}`}><div className="flex items-center justify-between"><span className={`flex h-12 w-12 items-center justify-center rounded-full text-sm font-bold ${index % 3 === 1 ? 'bg-[#A8B79A] text-[#2C3339]' : 'bg-[#FAF6F0]/65 text-[#7D6485]'}`}>{item.initials}</span><div className={index % 3 === 1 ? 'text-[#C9A876]' : 'text-[#7D6485]'}>{[0,1,2,3,4].map((star) => <Star key={star} size={13} className="mr-1 inline" fill="currentColor" />)}</div></div><blockquote className="mt-8 font-serif text-2xl leading-[1.3]">“{item.text}”</blockquote><p className={`mt-7 text-[10px] font-bold uppercase tracking-[.14em] ${index % 3 === 1 ? 'text-[#FAF6F0]/60' : 'text-[#2C3339]/55'}`}>{item.detail}</p></article></Reveal>)}</div></section><section className="bg-[#2C3339] px-5 py-24 text-[#FAF6F0] md:px-10"><div className="section-wrap grid items-center gap-10 lg:grid-cols-[.8fr_1.2fr]"><div><div className="eyebrow !text-[#A8B79A]">A note on testimonials</div><h2 className="display mt-5 text-4xl leading-[1.06] md:text-5xl">Privacy comes before proof.</h2></div><p className="max-w-[600px] text-lg leading-[1.8] text-[#FAF6F0]/65">Therapy is deeply personal. These reflections are here to help you understand how the space can feel, not to promise a particular outcome. Your story will always belong to you.</p></div></section></SiteLayout>;
+
+  return (
+    <SiteLayout>
+      <PageIntro
+        label="Words from the room"
+        title={
+          <>
+            You are allowed to feel <em className="text-[#7D6485]">better.</em>
+          </>
+        }
+        description="Shared with permission. Names and details have been changed to protect privacy. Every person’s process is different."
+      />
+      <section className="bg-[#FAF6F0] px-5 pb-24 md:px-10 md:pb-36">
+        <div className="section-wrap grid gap-5 md:grid-cols-2">
+          {testimonials.map((item, index) => (
+            <Reveal key={item.initials} delay={index * 0.06}>
+              <article
+                className={`flex min-h-[310px] flex-col justify-between rounded-[2rem] p-7 md:p-9 ${
+                  index % 3 === 0 ? 'bg-[#A8B79A]/45' : index % 3 === 1 ? 'bg-[#7D6485] text-[#FAF6F0]' : 'bg-[#C9A876]/35'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span
+                    className={`flex h-12 w-12 items-center justify-center rounded-full text-sm font-bold ${
+                      index % 3 === 1 ? 'bg-[#A8B79A] text-[#2C3339]' : 'bg-[#FAF6F0]/65 text-[#7D6485]'
+                    }`}
+                  >
+                    {item.initials}
+                  </span>
+                  <div className={index % 3 === 1 ? 'text-[#C9A876]' : 'text-[#7D6485]'}>
+                    {[0, 1, 2, 3, 4].map((star) => (
+                      <Star key={star} size={13} className="mr-1 inline" fill="currentColor" />
+                    ))}
+                  </div>
+                </div>
+                <blockquote className="mt-8 font-serif text-2xl leading-[1.3]">“{item.text}”</blockquote>
+                <p className={`mt-7 text-[10px] font-bold uppercase tracking-[.14em] ${index % 3 === 1 ? 'text-[#FAF6F0]/60' : 'text-[#2C3339]/55'}`}>
+                  {item.detail}
+                </p>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+      <section className="bg-[#2C3339] px-5 py-24 text-[#FAF6F0] md:px-10">
+        <div className="section-wrap grid items-center gap-10 lg:grid-cols-[.8fr_1.2fr]">
+          <div>
+            <div className="eyebrow !text-[#A8B79A]">A note on testimonials</div>
+            <h2 className="display mt-5 text-4xl leading-[1.06] md:text-5xl">Privacy comes before proof.</h2>
+          </div>
+          <p className="max-w-[600px] text-lg leading-[1.8] text-[#FAF6F0]/65">
+            Therapy is deeply personal. These reflections are here to help you understand how the space can feel, not to promise a particular outcome. Your story will always belong to you.
+          </p>
+        </div>
+      </section>
+    </SiteLayout>
+  );
 }
 
 function FAQPage() {
   usePageMeta('Frequently asked questions', 'Answers to common questions about starting trauma-informed therapy with Rebecca Dakin.');
   const questions = [
-    ['What if I do not know where to begin?', 'That is a completely valid place to begin. You do not need a perfect explanation or a diagnosis. In our first conversation, we can simply notice what is feeling hard and what you would like to be different.'],
-    ['I have tried therapy before and it did not help. Is this different?', 'It makes sense to feel cautious after an experience that missed the mark. We will talk about what felt unhelpful before, what you need in order to feel safe, and whether my way of working feels like a good fit before you commit to anything.'],
-    ['Do I have to talk about everything that happened?', 'No. You stay in charge of what you share, when you share it, and how we work with it. Safety and stabilisation come first. There is no pressure to go further than your nervous system is ready for.'],
-    ['Do you work online or in person?', 'I offer secure online sessions and in-person appointments in a quiet, private room in Bristol. We can talk through which setting might support you best during our initial call.'],
-    ['How many sessions will I need?', 'There is no meaningful one-size-fits-all answer. Some people come for focused support around a specific experience; others want longer-term space. We review how things are feeling together as we go.'],
-    ['What happens if I need to cancel?', 'I understand that life and nervous systems are not always predictable. We will talk through the cancellation policy clearly before you begin, so there are no surprises.'],
+    [
+      'What if I do not know where to begin?',
+      'That is a completely valid place to begin. You do not need a perfect explanation or a diagnosis. In our first conversation, we can simply notice what is feeling hard and what you would like to be different.',
+    ],
+    [
+      'I have tried therapy before and it did not help. Is this different?',
+      'It makes sense to feel cautious after an experience that missed the mark. We will talk about what felt unhelpful before, what you need in order to feel safe, and whether my way of working feels like a good fit before you commit to anything.',
+    ],
+    [
+      'Do I have to talk about everything that happened?',
+      'No. You stay in charge of what you share, when you share it, and how we work with it. Safety and stabilisation come first. There is no pressure to go further than your nervous system is ready for.',
+    ],
+    [
+      'Do you work online or in person?',
+      'I offer secure online sessions and in-person appointments in a quiet, private room in Bristol. We can talk through which setting might support you best during our initial call.',
+    ],
+    [
+      'How many sessions will I need?',
+      'There is no meaningful one-size-fits-all answer. Some people come for focused support around a specific experience; others want longer-term space. We review how things are feeling together as we go.',
+    ],
+    [
+      'What happens if I need to cancel?',
+      'I understand that life and nervous systems are not always predictable. We will talk through the cancellation policy clearly before you begin, so there are no surprises.',
+    ],
   ];
   const [open, setOpen] = useState(0);
-  return <SiteLayout><PageIntro label="A few answers" title={<>Questions are <em className="text-[#7D6485]">welcome</em> here.</>} description="You are not expected to know the therapy vocabulary. Bring your questions, your uncertainty, or simply a sense that something needs to change." /><section className="bg-[#FAF6F0] px-5 pb-24 md:px-10 md:pb-36"><div className="section-wrap grid gap-14 md:grid-cols-[.65fr_1.35fr]"><div><DecorativeLotus className="h-36 w-36 text-[#C9A876]" /><p className="mt-7 max-w-[260px] text-sm leading-[1.8] text-[#2C3339]/60">Still wondering something? Bring it to our first conversation. You do not need to decide whether therapy is right for you before you reach out.</p></div><div className="divide-y divide-[#2C3339]/12 border-y border-[#2C3339]/12">{questions.map(([question, answer], index) => { const isOpen = open === index; return <div key={question}><button type="button" onClick={() => setOpen(isOpen ? -1 : index)} aria-expanded={isOpen} data-testid={`button-faq-${index}`} className="focus-ring flex w-full items-center justify-between gap-6 rounded-sm py-6 text-left"><span className="display text-xl leading-tight">{question}</span><ChevronDown size={19} className={`faq-chevron shrink-0 text-[#7D6485] ${isOpen ? 'is-open' : ''}`} /></button><div className={`faq-answer ${isOpen ? 'is-open' : ''}`}><div><p className="pb-6 pr-8 text-sm leading-[1.8] text-[#2C3339]/65">{answer}</p></div></div></div>; })}</div></div></section><section className="bg-[#A8B79A]/45 px-5 py-20 md:px-10"><div className="section-wrap flex flex-col justify-between gap-7 md:flex-row md:items-center"><h2 className="display max-w-[600px] text-4xl leading-[1.05] md:text-5xl">Have a question that is not here?</h2><Link href="/contact" data-testid="link-faq-contact" className="focus-ring flex w-fit items-center gap-2 rounded-full bg-[#2C3339] px-6 py-4 text-xs font-bold uppercase tracking-[.12em] text-[#FAF6F0]">Ask Rebecca <ArrowRight size={15} /></Link></div></section></SiteLayout>;
+
+  return (
+    <SiteLayout>
+      <PageIntro
+        label="A few answers"
+        title={
+          <>
+            Questions are <em className="text-[#7D6485]">welcome</em> here.
+          </>
+        }
+        description="You are not expected to know the therapy vocabulary. Bring your questions, your uncertainty, or simply a sense that something needs to change."
+      />
+      <section className="bg-[#FAF6F0] px-5 pb-24 md:px-10 md:pb-36">
+        <div className="section-wrap grid gap-14 md:grid-cols-[.65fr_1.35fr]">
+          <div>
+            <DecorativeLotus className="h-36 w-36 text-[#C9A876]" />
+            <p className="mt-7 max-w-[260px] text-sm leading-[1.8] text-[#2C3339]/60">
+              Still wondering something? Bring it to our first conversation. You do not need to decide whether therapy is right for you before you reach out.
+            </p>
+          </div>
+          <div className="divide-y divide-[#2C3339]/12 border-y border-[#2C3339]/12">
+            {questions.map(([question, answer], index) => {
+              const isOpen = open === index;
+              return (
+                <div key={question}>
+                  <button
+                    type="button"
+                    onClick={() => setOpen(isOpen ? -1 : index)}
+                    aria-expanded={isOpen}
+                    data-testid={`button-faq-${index}`}
+                    className="focus-ring flex w-full items-center justify-between gap-6 rounded-sm py-6 text-left"
+                  >
+                    <span className="display text-xl leading-tight">{question}</span>
+                    <ChevronDown size={19} className={`faq-chevron shrink-0 text-[#7D6485] ${isOpen ? 'is-open' : ''}`} />
+                  </button>
+                  <div className={`faq-answer ${isOpen ? 'is-open' : ''}`}>
+                    <div>
+                      <p className="pb-6 pr-8 text-sm leading-[1.8] text-[#2C3339]/65">{answer}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+      <section className="bg-[#A8B79A]/45 px-5 py-20 md:px-10">
+        <div className="section-wrap flex flex-col justify-between gap-7 md:flex-row md:items-center">
+          <h2 className="display max-w-[600px] text-4xl leading-[1.05] md:text-5xl">Have a question that is not here?</h2>
+          <Link href="/contact" data-testid="link-faq-contact" className="focus-ring flex w-fit items-center gap-2 rounded-full bg-[#2C3339] px-6 py-4 text-xs font-bold uppercase tracking-[.12em] text-[#FAF6F0]">
+            Ask Rebecca <ArrowRight size={15} />
+          </Link>
+        </div>
+      </section>
+    </SiteLayout>
+  );
 }
 
 function ContactPage() {
-  usePageMeta('Contact and booking', 'Take a gentle first step with RD Trauma Healing. Ask a question or request an initial conversation.');
+  usePageMeta('Contact and booking', 'Take a gentle first step with RD Trauma Healing. Request an appointment or ask a question.');
   const [sent, setSent] = useState(false);
-  const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); setSent(true); };
-  return <SiteLayout><PageIntro label="A private first conversation" title={<>Whenever you are <em className="text-[#7D6485]">ready.</em></>} description="Tell me a little about what is happening, or simply say hello. I will reply within 2 working days." /><section className="bg-[#FAF6F0] px-5 pb-24 md:px-10 md:pb-36"><div className="section-wrap grid gap-12 lg:grid-cols-[.85fr_1.15fr] lg:gap-20"><Reveal><BookingWidget /><div className="mt-8 space-y-4 rounded-[1.5rem] bg-[#A8B79A]/25 p-6 text-sm text-[#2C3339]/70"><p className="flex items-start gap-3"><MessageCircle className="mt-1 shrink-0 text-[#7D6485]" size={17} /> Prefer to message first? That is welcome. We will not book anything without talking it through.</p><a href="https://wa.me/447000000000" target="_blank" rel="noreferrer" data-testid="link-contact-whatsapp" className="line-link ml-7 text-xs font-bold uppercase tracking-[.12em] text-[#7D6485]">WhatsApp (placeholder number)</a></div></Reveal><Reveal delay={.1}><div className="rounded-[2rem] bg-[#2C3339] p-7 text-[#FAF6F0] md:p-10">{sent ? <div className="flex min-h-[430px] flex-col items-center justify-center text-center"><span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#A8B79A] text-[#2C3339]"><Check size={28} /></span><h3 className="display mt-6 text-3xl">Thank you for reaching out.</h3><p className="mt-3 max-w-[330px] text-sm leading-[1.7] text-[#FAF6F0]/65">Rebecca will be in touch within 2 working days. There is no obligation to continue.</p><button type="button" onClick={() => setSent(false)} data-testid="button-contact-reset" className="line-link mt-7 text-xs font-bold uppercase tracking-[.12em] text-[#A8B79A]">Send another message</button></div> : <form onSubmit={submit} className="space-y-5"><div className="mb-7"><p className="text-[10px] font-bold uppercase tracking-[.15em] text-[#C9A876]">Or send a note</p><h2 className="display mt-2 text-4xl leading-[1.05]">What would you like me to know?</h2></div><label className="block"><span className="mb-2 block text-xs text-[#FAF6F0]/65">Your name</span><input required data-testid="input-contact-name" className="focus-ring w-full rounded-xl border border-[#FAF6F0]/20 bg-transparent px-4 py-3 text-sm text-[#FAF6F0] outline-none placeholder:text-[#FAF6F0]/35" placeholder="First name is plenty" /></label><label className="block"><span className="mb-2 block text-xs text-[#FAF6F0]/65">Email address</span><input required type="email" data-testid="input-contact-email" className="focus-ring w-full rounded-xl border border-[#FAF6F0]/20 bg-transparent px-4 py-3 text-sm text-[#FAF6F0] outline-none placeholder:text-[#FAF6F0]/35" placeholder="you@example.com" /></label><label className="block"><span className="mb-2 block text-xs text-[#FAF6F0]/65">Your message <span className="text-[#FAF6F0]/40">(optional)</span></span><textarea data-testid="textarea-contact-message" rows={5} className="focus-ring w-full resize-none rounded-xl border border-[#FAF6F0]/20 bg-transparent px-4 py-3 text-sm text-[#FAF6F0] outline-none placeholder:text-[#FAF6F0]/35" placeholder="A few words, or just “I’d like to talk”" /></label><button type="submit" data-testid="button-contact-submit" className="group flex w-full items-center justify-between rounded-xl bg-[#A8B79A] px-5 py-4 text-xs font-bold uppercase tracking-[.12em] text-[#2C3339] transition-transform hover:-translate-y-0.5">Send with care <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#2C3339]/10"><ArrowUpRight size={15} /></span></button><p className="flex items-center gap-2 text-[10px] leading-[1.5] text-[#FAF6F0]/45"><ShieldCheck size={12} /> Your details are treated as private. Contact details shown below are placeholders for launch.</p></form>}</div></Reveal></div></section><section className="bg-[#7D6485]/18 px-5 py-20 md:px-10"><div className="section-wrap grid gap-8 md:grid-cols-3"><div><p className="text-[10px] font-bold uppercase tracking-[.15em] text-[#7D6485]">Email</p><a href="mailto:hello@example.com" data-testid="link-contact-email" className="mt-3 block text-lg hover:text-[#7D6485]">hello@example.com</a><p className="mt-1 text-[10px] uppercase tracking-[.1em] text-[#2C3339]/45">(placeholder)</p></div><div><p className="text-[10px] font-bold uppercase tracking-[.15em] text-[#7D6485]">Phone</p><a href="tel:+440700000000" data-testid="link-contact-phone" className="mt-3 block text-lg hover:text-[#7D6485]">+44 (0)700 000 0000</a><p className="mt-1 text-[10px] uppercase tracking-[.1em] text-[#2C3339]/45">(placeholder)</p></div><div><p className="text-[10px] font-bold uppercase tracking-[.15em] text-[#7D6485]">Location</p><p className="mt-3 text-lg">Bristol, UK</p><p className="mt-1 text-sm text-[#2C3339]/55">Quiet room appointments · secure online sessions</p></div></div></section></SiteLayout>;
+  const search = typeof window !== 'undefined' ? window.location.search : '';
+  const params = new URLSearchParams(search);
+  const initialPackage = params.get('package') === 'block' ? 'block' : 'single';
+
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSent(true);
+  };
+
+  return (
+    <SiteLayout>
+      <PageIntro
+        label="A private first conversation"
+        title={
+          <>
+            Whenever you are <em className="text-[#7D6485]">ready.</em>
+          </>
+        }
+        description="Request your preferred appointment time below, or send a gentle note. I will reply directly within 2 working days."
+      />
+      <section className="bg-[#FAF6F0] px-5 pb-24 md:px-10 md:pb-36" id="appointment">
+        <div className="section-wrap space-y-16">
+          {/* PRIMARY APPOINTMENT REQUEST SYSTEM */}
+          <Reveal>
+            <BookingWidget initialPackage={initialPackage} />
+          </Reveal>
+
+          {/* ALTERNATIVE INQUIRIES & DIRECT MESSAGING */}
+          <Reveal delay={0.1}>
+            <div className="grid gap-8 lg:grid-cols-[1.05fr_.95fr] items-start pt-4">
+              {/* WhatsApp & Message first card */}
+              <div className="rounded-[2.5rem] border border-[#2C3339]/10 bg-white/70 p-8 md:p-10 shadow-sm space-y-5">
+                <span className="text-[10px] font-bold uppercase tracking-[.18em] text-[#7D6485]">Alternative Contact</span>
+                <h3 className="display text-3xl text-[#2C3339]">Prefer to message first?</h3>
+                <p className="text-sm leading-[1.8] text-[#2C3339]/70">
+                  That is completely welcome. We will not book anything without talking it through first and making sure my way of working feels like a safe, steady fit for you.
+                </p>
+                <div className="pt-2 flex flex-col sm:flex-row gap-4">
+                  <a
+                    href="https://wa.me/447858077379"
+                    target="_blank"
+                    rel="noreferrer"
+                    data-testid="link-contact-whatsapp"
+                    className="focus-ring inline-flex items-center justify-center gap-2 rounded-xl bg-[#A8B79A] px-5 py-3.5 text-xs font-bold uppercase tracking-[.12em] text-[#2C3339] transition-transform hover:-translate-y-0.5"
+                  >
+                    <MessageCircle size={16} /> Chat on WhatsApp
+                  </a>
+                  <a
+                    href="mailto:wellbeingsessions@traumahealingwithrebeccadakin.co.uk"
+                    data-testid="link-contact-email-btn"
+                    className="focus-ring inline-flex items-center justify-center gap-2 rounded-xl bg-[#2C3339] px-5 py-3.5 text-xs font-bold uppercase tracking-[.12em] text-[#FAF6F0] shadow-sm transition-transform hover:-translate-y-0.5 hover:bg-[#7D6485]"
+                  >
+                    <Mail size={16} /> Email Rebecca
+                  </a>
+                </div>
+              </div>
+
+              {/* Direct Note Form */}
+              <div className="rounded-[2.5rem] bg-[#2C3339] p-7 text-[#FAF6F0] md:p-9 shadow-md">
+                {sent ? (
+                  <div className="flex min-h-[340px] flex-col items-center justify-center text-center">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#A8B79A] text-[#2C3339]">
+                      <Check size={26} />
+                    </span>
+                    <h3 className="display mt-5 text-2xl">Thank you for reaching out.</h3>
+                    <p className="mt-2.5 max-w-[300px] text-xs leading-[1.7] text-[#FAF6F0]/70">
+                      Rebecca will be in touch within 2 working days. There is no obligation to continue.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setSent(false)}
+                      data-testid="button-contact-reset"
+                      className="line-link mt-6 text-xs font-bold uppercase tracking-[.12em] text-[#A8B79A]"
+                    >
+                      Send another note
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={submit} className="space-y-4">
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-[.15em] text-[#C9A876]">General Inquiries</p>
+                      <h3 className="display mt-1 text-2xl leading-[1.1]">Or send a note</h3>
+                    </div>
+                    <label className="block">
+                      <span className="mb-1 block text-xs text-[#FAF6F0]/65">Your name</span>
+                      <input
+                        required
+                        data-testid="input-contact-name"
+                        className="focus-ring w-full rounded-xl border border-[#FAF6F0]/20 bg-transparent px-4 py-2.5 text-sm text-[#FAF6F0] outline-none placeholder:text-[#FAF6F0]/35"
+                        placeholder="First name is plenty"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="mb-1 block text-xs text-[#FAF6F0]/65">Email address</span>
+                      <input
+                        required
+                        type="email"
+                        data-testid="input-contact-email"
+                        className="focus-ring w-full rounded-xl border border-[#FAF6F0]/20 bg-transparent px-4 py-2.5 text-sm text-[#FAF6F0] outline-none placeholder:text-[#FAF6F0]/35"
+                        placeholder="you@example.com"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="mb-1 block text-xs text-[#FAF6F0]/65">Your message</span>
+                      <textarea
+                        rows={3}
+                        data-testid="textarea-contact-message"
+                        className="focus-ring w-full resize-none rounded-xl border border-[#FAF6F0]/20 bg-transparent px-4 py-2.5 text-sm text-[#FAF6F0] outline-none placeholder:text-[#FAF6F0]/35"
+                        placeholder="A few words, or just “I’d like to talk”"
+                      />
+                    </label>
+                    <button
+                      type="submit"
+                      data-testid="button-contact-submit"
+                      className="group flex w-full items-center justify-between rounded-xl bg-[#A8B79A] px-5 py-3.5 text-xs font-bold uppercase tracking-[.12em] text-[#2C3339] transition-transform hover:-translate-y-0.5"
+                    >
+                      Send note <ArrowUpRight size={15} />
+                    </button>
+                    <p className="flex items-center gap-1.5 text-[10px] text-[#FAF6F0]/45">
+                      <ShieldCheck size={12} /> Confidential and private.
+                    </p>
+                  </form>
+                )}
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+    </SiteLayout>
+  );
 }
 
-export { AboutPage, ContactPage, FAQPage, HomePage, ServicesPage, TestimonialsPage };
+export { AboutPage, ContactPage, FAQPage, HomePage, PricingSection, ServicesPage, TestimonialsPage };
