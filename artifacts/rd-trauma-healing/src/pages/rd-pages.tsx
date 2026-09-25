@@ -35,17 +35,24 @@ import {
 
 function usePageMeta(title: string, description: string) {
   useEffect(() => {
-    document.title = title ? `${title} | RD Trauma Healing` : 'RD Trauma Healing';
+    const fullTitle = title ? `${title} | RD Trauma Healing` : 'RD Trauma Healing | Rebecca Dakin';
+    document.title = fullTitle;
     const meta = document.querySelector('meta[name="description"]');
     if (meta) meta.setAttribute('content', description);
     const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', title ? `${title} | RD Trauma Healing` : 'RD Trauma Healing');
+    if (ogTitle) ogTitle.setAttribute('content', fullTitle);
     const ogDesc = document.querySelector('meta[property="og:description"]');
     if (ogDesc) ogDesc.setAttribute('content', description);
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.setAttribute('content', window.location.href);
     const twitterTitle = document.querySelector('meta[name="twitter:title"]');
-    if (twitterTitle) twitterTitle.setAttribute('content', title ? `${title} | RD Trauma Healing` : 'RD Trauma Healing');
+    if (twitterTitle) twitterTitle.setAttribute('content', fullTitle);
     const twitterDesc = document.querySelector('meta[name="twitter:description"]');
     if (twitterDesc) twitterDesc.setAttribute('content', description);
+    const twitterUrl = document.querySelector('meta[name="twitter:url"]');
+    if (twitterUrl) twitterUrl.setAttribute('content', window.location.href);
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.setAttribute('href', window.location.href);
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, [title, description]);
 }

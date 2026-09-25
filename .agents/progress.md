@@ -125,6 +125,14 @@ flowchart TD
   - Added leading apostrophe prefix for international phone numbers starting with `+` to prevent Google Sheets `#ERROR!` formula calculation errors.
   - Added diagnostic endpoint `GET /api/appointments` providing instant status verification and actionable troubleshooting feedback directly from the live Vercel domain.
   - Verified live row append and fetched rows using MCP `sheets_get_data` confirming rows 2, 3, and 4.
+- [x] **Cross-Platform Social Media Sharing & Open Graph Preview Enhancement**
+  - Resolved missing social preview issue across platforms (WhatsApp, Facebook, Twitter/X, iMessage, Slack, Discord) where relative URL `/rd-trauma-healing-logo.png` was previously only supported by LinkedInBot.
+  - Generated dedicated high-definition 1.91:1 landscape social preview card (`og-card.png`, 1200x630, 160 KB) featuring the circular RD Trauma Healing logo centered on the signature `#FAF6F0` tranquil cream background with safe margins.
+  - Configured full Open Graph and Twitter Card tags in `index.html` with absolute HTTPS URLs, image dimensions (`1200x630` primary and `976x898` secondary badge fallback), MIME types, and canonical URL.
+  - Added `htmlMetaPlugin` in `vite.config.ts` dynamically resolving site URLs from `VITE_SITE_URL`, `VERCEL_PROJECT_PRODUCTION_URL`, `VERCEL_URL`, or default `https://rd-trauma-healing.vercel.app` ensuring automatic adaptation whether shared via Vercel deployment link or future custom domain.
+  - Added permissive CORS headers (`Access-Control-Allow-Origin: *`) and caching in `vercel.json` for image assets.
+  - Enhanced client-side `usePageMeta` hook in `src/pages/rd-pages.tsx` to synchronize `og:url`, `twitter:url`, and canonical links on route navigation.
+  - Verified clean TypeScript check (`tsc --noEmit`) and successful production build (`dist/public`).
 
 ### Pending Tasks
 

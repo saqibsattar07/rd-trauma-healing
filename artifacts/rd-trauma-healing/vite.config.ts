@@ -49,12 +49,35 @@ function appointmentApiPlugin(): Plugin {
   };
 }
 
+function htmlMetaPlugin(): Plugin {
+  return {
+    name: 'html-meta-plugin',
+    transformIndexHtml(html) {
+      const rawDomain =
+        process.env.VITE_SITE_URL ||
+        process.env.SITE_URL ||
+        (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : '') ||
+        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') ||
+        'https://rd-trauma-healing.vercel.app';
+
+      const siteUrl = (rawDomain.startsWith('http://') || rawDomain.startsWith('https://')
+        ? rawDomain
+        : `https://${rawDomain}`).replace(/\/+$/, '');
+
+      return html
+        .replace(/__SITE_URL__/g, siteUrl)
+        .replace(/https:\/\/rd-trauma-healing\.vercel\.app/g, siteUrl);
+    },
+  };
+}
+
 export default defineConfig({
   base: basePath,
   plugins: [
     react(),
     tailwindcss(),
     appointmentApiPlugin(),
+    htmlMetaPlugin(),
   ],
   resolve: {
     alias: {
