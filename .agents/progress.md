@@ -113,7 +113,12 @@ flowchart TD
   - Removed obsolete `pnpm-lock.yaml` and `pnpm-workspace.yaml` which triggered `ERR_PNPM_OUTDATED_LOCKFILE`.
   - Added root `package-lock.json` and explicit `packageManager: "npm@10.8.2"` in root `package.json`.
   - Configured `installCommand: "npm install"` in `vercel.json` for deterministic CI installs on Vercel.
-  - Pushed fix commit `948c29a` to GitHub `origin main`.
+  - Pushed fix commit `948c29a` and JavaScript serverless functions `39c8f07` to GitHub `origin main`.
+- [x] **Google Sheets Live Sync & Confirmation Screen Polish**
+  - Verified live write access to Google Spreadsheet `RD Trauma Healing` (`1rxeDwaAp6Dk4_OeaeBlVjcFXyNhGg9KkmSYfjYTVCYA`).
+  - Automatically populated the 10 column headers on Row 1 and appended test appointment row.
+  - Made the post-submission "Have a question? WhatsApp Rebecca" button visible by default with solid sage green styling (`bg-[#A8B79A] text-[#2C3339]`) and official `<MessageCircle size={15} />` icon.
+  - Pushed changes in commit `3c95f5d` to GitHub `origin main`.
 
 ### Pending Tasks
 
