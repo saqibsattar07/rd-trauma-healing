@@ -97,7 +97,7 @@ async function appendViaServiceAccount(
   clientEmail: string,
   privateKey: string,
   sheetId: string
-): Promise<boolean> {
+): Promise<{ success: boolean; error?: string }> {
   try {
     const jwt = createGoogleJwt(clientEmail, privateKey);
 
@@ -116,12 +116,64 @@ async function appendViaServiceAccount(
     if (!tokenResponse.ok) {
       const errText = await tokenResponse.text();
       console.error('[Google Sheets] OAuth token exchange failed:', errText);
-      return false;
+      return { success: false, error: `OAuth token failed: ${errText}` };
     }
 
     const { access_token } = (await tokenResponse.json()) as { access_token: string };
 
-    // 2. Append row to Sheet1
+    // 2. Fetch spreadsheet to determine the first sheet's actual title
+    const metaResponse = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}`, {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+
+    if (!metaResponse.ok) {
+      const metaErr = await metaResponse.text();
+      console.error('[Google Sheets] Fetch metadata failed:', metaErr);
+      return { success: false, error: `Spreadsheet access error (check sharing & API status): ${metaErr}` };
+    }
+
+    const metaData = await metaResponse.json();
+    const sheetTitle = metaData?.sheets?.[0]?.properties?.title || 'Sheet1';
+    const encodedTitle = encodeURIComponent(sheetTitle);
+
+    // 3. Check if header row exists
+    try {
+      const checkHeaderUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/'${encodedTitle}'!A1:J1`;
+      const headerCheckRes = await fetch(checkHeaderUrl, {
+        headers: { Authorization: `Bearer ${access_token}` },
+      });
+
+      if (headerCheckRes.ok) {
+        const headerData = await headerCheckRes.json();
+        if (!headerData.values || headerData.values.length === 0) {
+          // Automatically write headers on row 1
+          const headers = [
+            'Submission Date/Time',
+            'Patient Name',
+            'Email',
+            'Phone',
+            'Appointment Date',
+            'Appointment Time',
+            'Session Type',
+            'Price',
+            'Message',
+            'Status',
+          ];
+          await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/'${encodedTitle}'!A1:J1?valueInputOption=USER_ENTERED`, {
+            method: 'PUT',
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ values: [headers] }),
+          });
+        }
+      }
+    } catch {
+      // Continue to append even if header check has a non-fatal glitch
+    }
+
+    // 4. Append appointment row
     const rowValues = [
       record.submissionDateTime,
       record.patientName,
@@ -135,7 +187,7 @@ async function appendViaServiceAccount(
       record.status,
     ];
 
-    const appendUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A1:append?valueInputOption=USER_ENTERED`;
+    const appendUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/'${encodedTitle}'!A1:append?valueInputOption=USER_ENTERED`;
     const appendResponse = await fetch(appendUrl, {
       method: 'POST',
       headers: {
@@ -150,21 +202,21 @@ async function appendViaServiceAccount(
     if (!appendResponse.ok) {
       const appendErr = await appendResponse.text();
       console.error('[Google Sheets] Append row failed:', appendErr);
-      return false;
+      return { success: false, error: `Append failed: ${appendErr}` };
     }
 
-    console.log(`[Google Sheets] Successfully appended appointment row for ${record.patientName}`);
-    return true;
-  } catch (err) {
+    console.log(`[Google Sheets] Successfully appended appointment row for ${record.patientName} into '${sheetTitle}'`);
+    return { success: true };
+  } catch (err: any) {
     console.error('[Google Sheets] Service account error:', err);
-    return false;
+    return { success: false, error: err.message || 'Unknown error' };
   }
 }
 
 /**
  * Appends appointment row to Google Sheet using a Google Apps Script Webhook.
  */
-async function appendViaWebhook(record: AppointmentRecord, webhookUrl: string): Promise<boolean> {
+async function appendViaWebhook(record: AppointmentRecord, webhookUrl: string): Promise<{ success: boolean; error?: string }> {
   try {
     const response = await fetch(webhookUrl, {
       method: 'POST',
@@ -188,14 +240,14 @@ async function appendViaWebhook(record: AppointmentRecord, webhookUrl: string): 
     if (!response.ok) {
       const text = await response.text();
       console.error('[Google Sheets] Webhook response not OK:', text);
-      return false;
+      return { success: false, error: `Webhook error: ${text}` };
     }
 
     console.log(`[Google Sheets Webhook] Successfully posted appointment for ${record.patientName}`);
-    return true;
-  } catch (err) {
+    return { success: true };
+  } catch (err: any) {
     console.error('[Google Sheets] Webhook error:', err);
-    return false;
+    return { success: false, error: err.message || 'Unknown webhook error' };
   }
 }
 
@@ -315,27 +367,31 @@ function resolveGoogleCredentials(): { email?: string; privateKey?: string; shee
 
   // 2. Determine Google Sheets destination
   let googleSheetsSaved = false;
+  let googleSheetsError: string | undefined;
   const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
   const { email: saEmail, privateKey: saKey, sheetId } = resolveGoogleCredentials();
 
   if (webhookUrl) {
-    googleSheetsSaved = await appendViaWebhook(record, webhookUrl);
+    const res = await appendViaWebhook(record, webhookUrl);
+    googleSheetsSaved = res.success;
+    googleSheetsError = res.error;
   } else if (saEmail && saKey && sheetId) {
-    googleSheetsSaved = await appendViaServiceAccount(record, saEmail, saKey, sheetId);
+    const res = await appendViaServiceAccount(record, saEmail, saKey, sheetId);
+    googleSheetsSaved = res.success;
+    googleSheetsError = res.error;
   } else if (saEmail && saKey && !sheetId) {
-    console.warn(
-      '[Google Sheets] Google Service Account credentials detected, but GOOGLE_SHEETS_SPREADSHEET_ID is missing. Please provide the Spreadsheet ID in .env.'
-    );
+    googleSheetsError = 'GOOGLE_SHEETS_SPREADSHEET_ID is missing from environment variables.';
+    console.warn('[Google Sheets]', googleSheetsError);
   } else {
-    console.log(
-      '[Google Sheets] Notice: Google Sheets credentials not configured. Appointment saved to local backup.'
-    );
+    googleSheetsError = 'Google Sheets credentials not configured in environment variables.';
+    console.log('[Google Sheets]', googleSheetsError);
   }
 
   return {
     success: true,
     appointmentId: id,
     googleSheetsSaved,
+    ...(googleSheetsError && !googleSheetsSaved ? { googleSheetsError } : {}),
     message: 'Thank you. Your appointment request has been received. Rebecca will contact you to confirm your session.',
   };
 }

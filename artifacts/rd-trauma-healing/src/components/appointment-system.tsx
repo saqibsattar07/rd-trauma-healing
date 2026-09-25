@@ -27,6 +27,7 @@ import {
   Loader2,
   Lock,
   Mail,
+  MessageCircle,
   MessageSquare,
   Phone,
   ShieldCheck,
@@ -309,9 +310,9 @@ export function AppointmentSystem({
               href="https://wa.me/447858077379"
               target="_blank"
               rel="noreferrer"
-              className="focus-ring inline-flex items-center gap-2 rounded-full border border-[#2C3339]/20 bg-white/70 px-5 py-2.5 text-xs font-bold uppercase tracking-[.12em] text-[#2C3339] hover:bg-[#2C3339] hover:text-[#FAF6F0]"
+              className="focus-ring inline-flex items-center gap-2 rounded-full bg-[#A8B79A] px-5 py-2.5 text-xs font-bold uppercase tracking-[.12em] text-[#2C3339] shadow-sm transition-transform hover:-translate-y-0.5 hover:bg-[#2C3339] hover:text-[#FAF6F0]"
             >
-              Have a question? WhatsApp Rebecca
+              <MessageCircle size={15} /> Have a question? WhatsApp Rebecca
             </a>
           </div>
         </div>
