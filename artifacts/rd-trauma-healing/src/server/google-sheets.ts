@@ -45,10 +45,29 @@ function saveLocalBackup(record: AppointmentRecord) {
   }
 }
 
+function normalizePrivateKey(raw?: string): string {
+  let k = String(raw || '').trim();
+  while ((k.startsWith('"') && k.endsWith('"')) || (k.startsWith("'") && k.endsWith("'"))) {
+    k = k.slice(1, -1).trim();
+  }
+  if (!k.includes('BEGIN') && (k.startsWith('LS0t') || k.startsWith('LS0tLS'))) {
+    try {
+      k = Buffer.from(k, 'base64').toString('utf8');
+    } catch {}
+  }
+  k = k.replace(/\r\n/g, '\n');
+  k = k.replace(/\\+r/g, '');
+  k = k.replace(/\\+n/g, '\n');
+  return k.trim();
+}
+
 /**
  * Creates a signed JWT for Google Service Account OAuth2 authentication.
  */
 function createGoogleJwt(clientEmail: string, privateKey: string): string {
+  const cleanEmail = String(clientEmail || '').trim().replace(/^["']|["']$/g, '');
+  const normalizedKey = normalizePrivateKey(privateKey);
+
   const header = {
     alg: 'RS256',
     typ: 'JWT',
@@ -56,7 +75,7 @@ function createGoogleJwt(clientEmail: string, privateKey: string): string {
 
   const now = Math.floor(Date.now() / 1000);
   const claim = {
-    iss: clientEmail,
+    iss: cleanEmail,
     scope: 'https://www.googleapis.com/auth/spreadsheets',
     aud: 'https://oauth2.googleapis.com/token',
     exp: now + 3600,
@@ -73,9 +92,6 @@ function createGoogleJwt(clientEmail: string, privateKey: string): string {
   const encodedHeader = encodeBase64Url(header);
   const encodedClaim = encodeBase64Url(claim);
   const signatureInput = `${encodedHeader}.${encodedClaim}`;
-
-  // Normalize private key formatting (handles escaped \n in env vars)
-  const normalizedKey = privateKey.replace(/\\n/g, '\n');
 
   const signer = crypto.createSign('RSA-SHA256');
   signer.update(signatureInput);
@@ -129,7 +145,7 @@ async function appendViaServiceAccount(
     if (!metaResponse.ok) {
       const metaErr = await metaResponse.text();
       console.error('[Google Sheets] Fetch metadata failed:', metaErr);
-      return { success: false, error: `Spreadsheet access error (check sharing & API status): ${metaErr}` };
+      return { success: false, error: `Spreadsheet access error: ${metaErr}` };
     }
 
     const metaData = await metaResponse.json();
@@ -146,7 +162,6 @@ async function appendViaServiceAccount(
       if (headerCheckRes.ok) {
         const headerData = await headerCheckRes.json();
         if (!headerData.values || headerData.values.length === 0) {
-          // Automatically write headers on row 1
           const headers = [
             'Submission Date/Time',
             'Patient Name',
@@ -170,15 +185,19 @@ async function appendViaServiceAccount(
         }
       }
     } catch {
-      // Continue to append even if header check has a non-fatal glitch
+      // Non-fatal if header check fails
     }
 
-    // 4. Append appointment row
+    // 4. Append appointment row (prefix '+' phone with apostrophe to avoid formula errors in Google Sheets)
+    const formattedPhone = String(record.phone || '').trim().startsWith('+')
+      ? `'${String(record.phone).trim()}`
+      : String(record.phone || '').trim();
+
     const rowValues = [
       record.submissionDateTime,
       record.patientName,
       record.email,
-      record.phone,
+      formattedPhone,
       record.appointmentDate,
       record.appointmentTime,
       record.sessionType,
@@ -252,9 +271,85 @@ async function appendViaWebhook(record: AppointmentRecord, webhookUrl: string): 
 }
 
 /**
+ * Resolves Google Cloud credentials from environment variables or local JSON key files.
+ */
+export function resolveGoogleCredentials(): { email?: string; privateKey?: string; sheetId?: string } {
+  let email =
+    process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ||
+    process.env.GOOGLE_CLIENT_EMAIL ||
+    process.env.CLIENT_EMAIL;
+  let privateKey =
+    process.env.GOOGLE_PRIVATE_KEY ||
+    process.env.PRIVATE_KEY;
+  let sheetId =
+    process.env.GOOGLE_SHEETS_SPREADSHEET_ID ||
+    process.env.GOOGLE_SPREADSHEET_ID ||
+    process.env.GOOGLE_SHEET_ID ||
+    process.env.SPREADSHEET_ID ||
+    process.env.SHEET_ID;
+
+  const keyEnv =
+    process.env.GOOGLE_SERVICE_ACCOUNT_KEY ||
+    process.env.GOOGLE_CREDENTIALS ||
+    process.env.GOOGLE_APPLICATION_CREDENTIALS ||
+    process.env.SERVICE_ACCOUNT_KEY ||
+    process.env.GOOGLE_SERVICE_ACCOUNT;
+
+  const candidateStrings = [keyEnv, email, privateKey, sheetId, process.env.CREDENTIALS].filter(Boolean);
+
+  for (const item of candidateStrings) {
+    if (typeof item === 'string') {
+      const trimmed = item.trim();
+      if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          if (parsed.client_email) email = parsed.client_email;
+          if (parsed.private_key) privateKey = parsed.private_key;
+          if (parsed.spreadsheet_id) sheetId = sheetId || parsed.spreadsheet_id;
+        } catch {}
+      }
+    }
+  }
+
+  const candidateFilePaths = [
+    keyEnv,
+    path.resolve(process.cwd(), 'google-service-account.json'),
+    path.resolve(process.cwd(), '..', 'google-service-account.json'),
+    path.resolve(process.cwd(), 'credentials.json'),
+    path.resolve(process.cwd(), '..', 'credentials.json'),
+    path.resolve(process.cwd(), 'rd-trauma-healing-a733e07960e6.json'),
+    path.resolve(process.cwd(), '..', 'rd-trauma-healing-a733e07960e6.json'),
+  ].filter(Boolean) as string[];
+
+  for (const filePath of candidateFilePaths) {
+    try {
+      if (typeof filePath === 'string' && fs.existsSync(filePath)) {
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        const parsed = JSON.parse(fileContent);
+        if (parsed.client_email && parsed.private_key) {
+          email = email || parsed.client_email;
+          privateKey = privateKey || parsed.private_key;
+          sheetId = sheetId || parsed.spreadsheet_id;
+          break;
+        }
+      }
+    } catch {}
+  }
+
+  if (email) {
+    email = email.trim().replace(/^["']|["']$/g, '');
+  }
+  if (sheetId) {
+    sheetId = sheetId.trim().replace(/^["']|["']$/g, '');
+    const match = sheetId.match(/\/d\/([a-zA-Z0-9-_]+)/);
+    if (match) sheetId = match[1];
+  }
+
+  return { email, privateKey, sheetId };
+}
+
+/**
  * Main server-side handler for appointment submissions.
- * Validates the payload, prepares record with initial 'Pending' status,
- * saves to Google Sheets securely, and maintains local backup.
  */
 export async function saveAppointment(payload: {
   patientName: string;
@@ -265,7 +360,7 @@ export async function saveAppointment(payload: {
   sessionType: string;
   price: string;
   message?: string;
-}): Promise<{ success: boolean; appointmentId: string; googleSheetsSaved: boolean; message: string }> {
+}): Promise<{ success: boolean; appointmentId: string; googleSheetsSaved: boolean; googleSheetsError?: string; message: string }> {
   // Validate mandatory fields
   if (!payload.patientName?.trim()) {
     throw new Error('Patient name is required.');
@@ -314,61 +409,13 @@ export async function saveAppointment(payload: {
   // 1. Always save local server backup
   saveLocalBackup(record);
 
-/**
- * Resolves Google Cloud credentials from environment variables or local JSON key files.
- * Supports GOOGLE_SERVICE_ACCOUNT_KEY, GOOGLE_APPLICATION_CREDENTIALS,
- * and standard google-service-account.json / credentials.json files.
- */
-function resolveGoogleCredentials(): { email?: string; privateKey?: string; sheetId?: string } {
-  let email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  let privateKey = process.env.GOOGLE_PRIVATE_KEY;
-  let sheetId = process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
-
-  // Potential JSON file paths or env vars:
-  const keyEnv = process.env.GOOGLE_SERVICE_ACCOUNT_KEY || process.env.GOOGLE_APPLICATION_CREDENTIALS;
-  const candidatePaths = [
-    keyEnv,
-    path.resolve(process.cwd(), 'google-service-account.json'),
-    path.resolve(process.cwd(), '..', 'google-service-account.json'),
-    path.resolve(process.cwd(), 'credentials.json'),
-    path.resolve(process.cwd(), '..', 'credentials.json'),
-    'e:\\rd-trauma-healing\\google-service-account.json',
-  ].filter(Boolean) as string[];
-
-  for (const candidate of candidatePaths) {
-    try {
-      if (candidate.trim().startsWith('{')) {
-        const parsed = JSON.parse(candidate);
-        if (parsed.client_email && parsed.private_key) {
-          email = email || parsed.client_email;
-          privateKey = privateKey || parsed.private_key;
-          sheetId = sheetId || parsed.spreadsheet_id;
-          break;
-        }
-      }
-      if (fs.existsSync(candidate)) {
-        const fileContent = fs.readFileSync(candidate, 'utf8');
-        const parsed = JSON.parse(fileContent);
-        if (parsed.client_email && parsed.private_key) {
-          email = email || parsed.client_email;
-          privateKey = privateKey || parsed.private_key;
-          sheetId = sheetId || parsed.spreadsheet_id;
-          console.log(`[Google Sheets] Loaded credentials from: ${candidate}`);
-          break;
-        }
-      }
-    } catch {
-      // Continue to next candidate
-    }
-  }
-
-  return { email, privateKey, sheetId };
-}
-
   // 2. Determine Google Sheets destination
   let googleSheetsSaved = false;
   let googleSheetsError: string | undefined;
-  const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
+  const webhookUrl =
+    process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
+    process.env.GOOGLE_WEBHOOK_URL ||
+    process.env.WEBHOOK_URL;
   const { email: saEmail, privateKey: saKey, sheetId } = resolveGoogleCredentials();
 
   if (webhookUrl) {
@@ -379,12 +426,19 @@ function resolveGoogleCredentials(): { email?: string; privateKey?: string; shee
     const res = await appendViaServiceAccount(record, saEmail, saKey, sheetId);
     googleSheetsSaved = res.success;
     googleSheetsError = res.error;
-  } else if (saEmail && saKey && !sheetId) {
+  } else if (!sheetId && (!saEmail || !saKey)) {
+    googleSheetsError =
+      'Google Sheets environment variables are not set on this deployment. Please verify Vercel environment variables and trigger a Redeploy.';
+    console.warn('[Google Sheets]', googleSheetsError);
+  } else if (!sheetId) {
     googleSheetsError = 'GOOGLE_SHEETS_SPREADSHEET_ID is missing from environment variables.';
     console.warn('[Google Sheets]', googleSheetsError);
-  } else {
-    googleSheetsError = 'Google Sheets credentials not configured in environment variables.';
-    console.log('[Google Sheets]', googleSheetsError);
+  } else if (!saEmail) {
+    googleSheetsError = 'GOOGLE_SERVICE_ACCOUNT_EMAIL is missing from environment variables.';
+    console.warn('[Google Sheets]', googleSheetsError);
+  } else if (!saKey) {
+    googleSheetsError = 'GOOGLE_PRIVATE_KEY is missing from environment variables.';
+    console.warn('[Google Sheets]', googleSheetsError);
   }
 
   return {

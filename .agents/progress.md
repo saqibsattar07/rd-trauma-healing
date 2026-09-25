@@ -119,6 +119,12 @@ flowchart TD
   - Automatically populated the 10 column headers on Row 1 and appended test appointment row.
   - Made the post-submission "Have a question? WhatsApp Rebecca" button visible by default with solid sage green styling (`bg-[#A8B79A] text-[#2C3339]`) and official `<MessageCircle size={15} />` icon.
   - Pushed changes in commit `3c95f5d` to GitHub `origin main`.
+- [x] **Vercel Environment Variable Normalization & Diagnostic Health Endpoint**
+  - Implemented comprehensive environment variable alias support (`GOOGLE_SHEETS_SPREADSHEET_ID`, `GOOGLE_SPREADSHEET_ID`, `SPREADSHEET_ID`, `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY`, etc.).
+  - Added robust private key sanitization supporting multiline, single-line escaped `\n`, double-escaped `\\n`, surrounding quotes, and base64 strings.
+  - Added leading apostrophe prefix for international phone numbers starting with `+` to prevent Google Sheets `#ERROR!` formula calculation errors.
+  - Added diagnostic endpoint `GET /api/appointments` providing instant status verification and actionable troubleshooting feedback directly from the live Vercel domain.
+  - Verified live row append and fetched rows using MCP `sheets_get_data` confirming rows 2, 3, and 4.
 
 ### Pending Tasks
 
