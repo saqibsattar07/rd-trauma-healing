@@ -133,6 +133,10 @@ flowchart TD
   - Added permissive CORS headers (`Access-Control-Allow-Origin: *`) and caching in `vercel.json` for image assets.
   - Enhanced client-side `usePageMeta` hook in `src/pages/rd-pages.tsx` to synchronize `og:url`, `twitter:url`, and canonical links on route navigation.
   - Verified clean TypeScript check (`tsc --noEmit`) and successful production build (`dist/public`).
+- [x] **Personal Domain Metadata & Social Preview Synchronization**
+  - Updated primary canonical URL and Open Graph metadata in `index.html` and `vite.config.ts` to `https://www.traumahealingwithrebeccadakin.co.uk`.
+  - Resolved cross-domain canonical mismatch where sharing the personal domain caused social platforms (Facebook, WhatsApp, Twitter) to drop previews due to mismatched `og:url` pointing to `rd-trauma-healing.vercel.app`.
+  - Verified that apex domain `traumahealingwithrebeccadakin.co.uk` 308 redirects smoothly to `www.traumahealingwithrebeccadakin.co.uk`, which now serves identical canonical and absolute image URLs matching the domain.
 
 ### Pending Tasks
 

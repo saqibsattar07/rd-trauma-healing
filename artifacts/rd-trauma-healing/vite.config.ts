@@ -53,12 +53,11 @@ function htmlMetaPlugin(): Plugin {
   return {
     name: 'html-meta-plugin',
     transformIndexHtml(html) {
+      const defaultDomain = 'https://www.traumahealingwithrebeccadakin.co.uk';
       const rawDomain =
         process.env.VITE_SITE_URL ||
         process.env.SITE_URL ||
-        (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : '') ||
-        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') ||
-        'https://rd-trauma-healing.vercel.app';
+        defaultDomain;
 
       const siteUrl = (rawDomain.startsWith('http://') || rawDomain.startsWith('https://')
         ? rawDomain
