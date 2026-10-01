@@ -569,7 +569,7 @@ export function AppointmentSystem({
               Your Details
             </h3>
             <p className="mt-1 text-xs md:text-sm text-[#2C3339]/65">
-              Your contact details are treated with strict confidentiality.
+              Your contact details are treated with strict confidentiality. Sessions are available online via Zoom or in-person in Leeds.
             </p>
           </div>
 
@@ -644,7 +644,7 @@ export function AppointmentSystem({
                   rows={3}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="A few words about what brings you here, or if you prefer online vs quiet room in Bristol..."
+                  placeholder="A few words about what brings you here, or if you prefer online via Zoom vs in-person in Leeds..."
                   className="focus-ring w-full rounded-xl border border-[#2C3339]/20 bg-white/90 px-4 py-3 text-sm text-[#2C3339] placeholder:text-[#2C3339]/35 resize-none"
                 />
               </div>

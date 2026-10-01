@@ -10,5 +10,8 @@
     "typecheck": "npm --prefix artifacts/rd-trauma-healing run typecheck",
     "postinstall": "npm --prefix artifacts/rd-trauma-healing install"
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "nodemailer": "^10.0.13"
+  }
 }

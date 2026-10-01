@@ -122,7 +122,7 @@ const services: Service[] = [
   { title: 'Attachment and relationships', summary: 'Make sense of patterns that show up between you and the people you love.', detail: 'When closeness has not always felt safe, relationships can become a place of doubt or overwork. We can gently build new ways of relating, receiving, and setting boundaries.', icon: Ear, accent: 'bg-[#C9A876]/25' },
   { title: 'Neurodiversity-aware therapy', summary: 'A flexible space that does not ask you to perform a version of yourself.', detail: 'We can adapt language, pacing, sensory needs, and structure so therapy works with your nervous system, not against it.', icon: Brain, accent: 'bg-[#A8B79A]/40' },
   { title: 'Self-worth and identity', summary: 'Move from managing other people’s expectations toward hearing your own voice.', detail: 'We untangle inherited beliefs and make space for a self-image that is kinder, more nuanced, and genuinely yours.', icon: Flower2, accent: 'bg-[#7D6485]/18' },
-  { title: 'Online therapy', summary: 'Private, secure sessions from a place where you can feel comfortable and supported.', detail: 'Online therapy can be just as connected and thoughtful as in-person work. We will find a rhythm, room, and setup that help you feel present.', icon: Sparkles, accent: 'bg-[#C9A876]/30' },
+  { title: 'Online therapy', summary: 'Private, secure sessions via Zoom from a place where you can feel comfortable and supported.', detail: 'Online therapy via Zoom can be just as connected, effective, and thoughtful as in-person work. We will find a rhythm, room, and setup that help you feel safe and present from the comfort of your own space.', icon: Sparkles, accent: 'bg-[#C9A876]/30' },
 ];
 
 const testimonials = [
@@ -364,13 +364,13 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Trust & Accreditations bar */}
+      {/* Trust & Practice bar */}
       <section className="border-y border-[#2C3339]/10 bg-[#A8B79A]/25 px-5 py-8 md:px-10">
         <div className="section-wrap grid gap-5 text-center sm:grid-cols-3 sm:text-left">
           {[
-            ['BACP registered', 'Ethical, accountable practice'],
+            ['Freelance practice', 'Working flexibly based on experience'],
             ['Trauma-informed', 'Thoughtful, grounded support'],
-            ['Online + Bristol', 'A private space that fits you'],
+            ['Online via Zoom + Leeds', 'A private space that fits you'],
           ].map(([title, copy]) => (
             <div key={title} className="flex items-start justify-center gap-4 sm:justify-start">
               <Check size={17} className="mt-1 text-[#7D6485]" />
@@ -611,7 +611,7 @@ function AboutPage() {
               </div>
               <div className="relative -mt-7 ml-auto w-fit rounded-2xl bg-[#FAF6F0] px-5 py-4 shadow-lg">
                 <p className="font-serif text-lg">Rebecca Dakin</p>
-                <p className="mt-1 text-[10px] uppercase tracking-[.15em] text-[#2C3339]/55">Trauma-informed therapist</p>
+                <p className="mt-1 text-[10px] uppercase tracking-[.15em] text-[#2C3339]/55">Trauma-informed practitioner</p>
               </div>
             </div>
           </Reveal>
@@ -620,20 +620,23 @@ function AboutPage() {
             <h2 className="display mt-5 text-4xl leading-[1.06] md:text-5xl">You will never have to perform “being okay” here.</h2>
             <div className="mt-8 space-y-5 text-[16px] leading-[1.85] text-[#2C3339]/68">
               <p>
-                I am Rebecca, a trauma-informed therapist based in Bristol. I work with adults who have been carrying difficult experiences, anxious thoughts, relationship patterns, or a sense of disconnection for longer than they ever expected.
+                I am Rebecca, a trauma-informed practitioner based in Leeds. I work with adults who have been carrying difficult experiences, anxious thoughts, relationship patterns, or a sense of disconnection for longer than they ever expected.
               </p>
               <p>
-                My own curiosity about therapy began with the same question many people bring to me: why can I understand what happened and still feel stuck in it? Training gave me tools, but the therapy room taught me that relationship, pacing, and genuine respect are just as important.
+                I currently work freelance, offering sessions based on extensive practical experience, and I am studying towards a Master’s in Mental Health and Wellbeing, expected to complete by the end of next year. Sessions are available online via Zoom as well as in person in Leeds.
               </p>
               <p>
-                I believe you are the expert in your experience. My role is to offer steadiness, thoughtful questions, and evidence-led approaches that help you understand your responses and build more choice.
+                My own curiosity about this work began with the same question many people bring to me: why can I understand what happened and still feel stuck in it? While academic learning provides useful foundations, practical experience has taught me that relationship, safety, pacing, and genuine respect matter before anything else.
+              </p>
+              <p>
+                I believe you are the expert in your experience. My role is to offer steadiness, thoughtful questions, and grounded approaches that help you understand your responses and build more choice.
               </p>
             </div>
 
             <div className="mt-9 grid gap-6 border-t border-[#2C3339]/12 pt-7 sm:grid-cols-2">
               <div>
-                <p className="font-serif text-lg">Qualifications</p>
-                <p className="mt-2 text-sm leading-[1.7] text-[#2C3339]/60">BSc Psychology · Postgraduate Diploma in Integrative Counselling · BACP Registered</p>
+                <p className="font-serif text-lg">Experience & Studies</p>
+                <p className="mt-2 text-sm leading-[1.7] text-[#2C3339]/60">Freelance practice grounded in extensive client experience · Studying towards a Master’s in Mental Health and Wellbeing (expected completion by the end of next year)</p>
               </div>
               <div>
                 <p className="font-serif text-lg">How I practise</p>
@@ -923,7 +926,11 @@ function FAQPage() {
     ],
     [
       'Do you work online or in person?',
-      'I offer secure online sessions and in-person appointments in a quiet, private room in Bristol. We can talk through which setting might support you best during our initial call.',
+      'I offer secure online sessions via Zoom and in-person appointments in a quiet, private room in Leeds. We can talk through which setting might support you best during our initial call.',
+    ],
+    [
+      'What is your background and way of working?',
+      'I work freelance, offering trauma-informed support grounded in extensive practical client experience. I am currently studying towards a Master’s in Mental Health and Wellbeing, expected to complete by the end of next year. Sessions are paced, compassionate, and focused on building safety in your nervous system.',
     ],
     [
       'How many sessions will I need?',
