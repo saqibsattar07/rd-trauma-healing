@@ -531,7 +531,6 @@ async function saveAppointment(payload) {
     console.warn('[Google Sheets]', googleSheetsError);
   } else if (!saKey) {
     googleSheetsError = 'GOOGLE_PRIVATE_KEY is missing from environment variables.';
-    googleSheetsError = 'GOOGLE_PRIVATE_KEY is missing from environment variables.';
     console.warn('[Google Sheets]', googleSheetsError);
   }
 
@@ -541,14 +540,16 @@ async function saveAppointment(payload) {
     emailNotificationResult = await sendEmailNotification(record);
   } catch (err) {
     console.error('[Email Notification] Error sending notification:', err);
+    emailNotificationResult = { success: false, method: 'none', error: err.message || String(err) };
   }
 
   return {
     success: true,
     appointmentId: id,
     googleSheetsSaved,
-    emailNotificationSent: emailNotificationResult.success,
+    emailNotificationSent: Boolean(emailNotificationResult.success),
     emailNotificationMethod: emailNotificationResult.method,
+    ...(emailNotificationResult.error ? { emailNotificationError: emailNotificationResult.error } : {}),
     ...(googleSheetsError && !googleSheetsSaved ? { googleSheetsError } : {}),
     message: 'Thank you. Your appointment request has been received. Rebecca will contact you to confirm your session.',
   };
@@ -590,6 +591,7 @@ function saveNotificationLog(record, notificationResult) {
 }
 
 async function sendEmailNotification(record) {
+  loadLocalEnvFile();
   const recipient =
     process.env.NOTIFICATION_EMAIL ||
     process.env.APPOINTMENT_NOTIFICATION_EMAIL ||
@@ -629,16 +631,16 @@ async function sendEmailNotification(record) {
       <p style="font-size: 14px; line-height: 1.6; margin-bottom: 16px;">A new appointment request has been submitted through your website booking form.</p>
       <table style="width: 100%; border-collapse: collapse; font-size: 14px; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
         <tr style="background: #f4eee6;"><td style="padding: 10px 14px; font-weight: bold; width: 35%; color: #7D6485;">Client Name</td><td style="padding: 10px 14px; font-weight: 600;">${record.patientName}</td></tr>
-        <tr><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;">Email</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;"><a href="mailto:${record.email}" style="color: #7D6485; text-decoration: underline;">${record.email}</a></td></tr>
-        <tr><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;">Phone</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;"><a href="tel:${record.phone}" style="color: #7D6485; text-decoration: underline;">${record.phone}</a></td></tr>
-        <tr><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;">Requested Date</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1; font-weight: 600;">${record.appointmentDate}</td></tr>
-        <tr><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;">Requested Time</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1; font-weight: 600;">${record.appointmentTime}</td></tr>
-        <tr><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;">Session Package</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;">${record.sessionType}</td></tr>
-        <tr><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;">Price</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1; font-weight: 600; color: #7D6485;">${record.price}</td></tr>
-        <tr><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;">Format</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;">Online via Zoom / In-person in Leeds</td></tr>
-        <tr><td style="padding: 10px 14px; border-top: 1px solid #f0eae1; vertical-align: top;">Client Message</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1; white-space: pre-wrap;">${record.message}</td></tr>
-        <tr><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;">Reference ID</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1; font-family: monospace; font-size: 12px;">${record.id}</td></tr>
-        <tr><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;">Submitted At</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1; font-size: 12px; color: #777;">${record.submissionDateTime}</td></tr>
+        <tr><td style="padding: 10px 14px; font-weight: bold; border-top: 1px solid #f0eae1;">Email</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;"><a href="mailto:${record.email}" style="color: #7D6485; text-decoration: underline;">${record.email}</a></td></tr>
+        <tr><td style="padding: 10px 14px; font-weight: bold; border-top: 1px solid #f0eae1;">Phone</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;"><a href="tel:${record.phone}" style="color: #7D6485; text-decoration: underline;">${record.phone}</a></td></tr>
+        <tr><td style="padding: 10px 14px; font-weight: bold; border-top: 1px solid #f0eae1;">Requested Date</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1; font-weight: 600;">${record.appointmentDate}</td></tr>
+        <tr><td style="padding: 10px 14px; font-weight: bold; border-top: 1px solid #f0eae1;">Requested Time</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1; font-weight: 600;">${record.appointmentTime}</td></tr>
+        <tr><td style="padding: 10px 14px; font-weight: bold; border-top: 1px solid #f0eae1;">Session Package</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;">${record.sessionType}</td></tr>
+        <tr><td style="padding: 10px 14px; font-weight: bold; border-top: 1px solid #f0eae1;">Price</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1; font-weight: 600; color: #7D6485;">${record.price}</td></tr>
+        <tr><td style="padding: 10px 14px; font-weight: bold; border-top: 1px solid #f0eae1;">Format</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1;">Online via Zoom / In-person in Leeds</td></tr>
+        <tr><td style="padding: 10px 14px; font-weight: bold; border-top: 1px solid #f0eae1; vertical-align: top;">Client Message</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1; white-space: pre-wrap;">${record.message}</td></tr>
+        <tr><td style="padding: 10px 14px; font-weight: bold; border-top: 1px solid #f0eae1;">Reference ID</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1; font-family: monospace; font-size: 12px;">${record.id}</td></tr>
+        <tr><td style="padding: 10px 14px; font-weight: bold; border-top: 1px solid #f0eae1;">Submitted At</td><td style="padding: 10px 14px; border-top: 1px solid #f0eae1; font-size: 12px; color: #777;">${record.submissionDateTime}</td></tr>
       </table>
       <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid #e2dcd5; font-size: 12px; color: #777;">
         RD Trauma Healing &middot; Leeds &amp; Online via Zoom
@@ -714,10 +716,18 @@ async function sendEmailNotification(record) {
 
   // Option 3: Nodemailer / SMTP
   const smtpHost = process.env.SMTP_HOST || process.env.EMAIL_HOST;
-  const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER || process.env.GMAIL_USER;
-  const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.GMAIL_APP_PASSWORD;
+  const rawSmtpUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+  const rawGmailUser = process.env.GMAIL_USER || process.env.GOOGLE_USER;
+  const rawGmailPass = (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
+  const rawSmtpPass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').replace(/\s+/g, '');
 
-  if ((smtpHost && smtpUser && smtpPass) || (process.env.GMAIL_APP_PASSWORD && smtpUser)) {
+  const isGmail = Boolean(rawGmailPass);
+  let authUser = isGmail
+    ? (rawGmailUser || (rawSmtpUser && /@(?:gmail|googlemail)\.com$/i.test(rawSmtpUser) ? rawSmtpUser : '') || rawSmtpUser)
+    : rawSmtpUser;
+  const authPass = isGmail ? rawGmailPass : rawSmtpPass;
+
+  if (authUser && authPass) {
     try {
       let nodemailer;
       try {
@@ -727,33 +737,34 @@ async function sendEmailNotification(record) {
       }
 
       if (nodemailer) {
-        const cleanPass = (process.env.GMAIL_APP_PASSWORD || smtpPass || '').replace(/\s+/g, '');
-        const transportConfig = process.env.GMAIL_APP_PASSWORD
+        const transportConfig = isGmail
           ? {
               service: 'gmail',
-              auth: { user: smtpUser, pass: cleanPass },
+              auth: { user: authUser, pass: authPass },
             }
           : {
-              host: smtpHost,
+              host: smtpHost || 'smtp.gmail.com',
               port: Number(process.env.SMTP_PORT) || 587,
               secure: process.env.SMTP_SECURE === 'true' || process.env.SMTP_PORT === '465',
-              auth: { user: smtpUser, pass: cleanPass },
+              auth: { user: authUser, pass: authPass },
             };
 
         const transporter = nodemailer.createTransport(transportConfig);
         await transporter.sendMail({
-          from: process.env.EMAIL_FROM || process.env.MAIL_FROM || `"RD Trauma Healing" <${smtpUser}>`,
+          from: process.env.EMAIL_FROM || process.env.MAIL_FROM || `"RD Trauma Healing" <${authUser}>`,
           to: recipient,
+          replyTo: `${record.patientName} <${record.email}>`,
           subject,
           text: plainText,
           html,
         });
-        console.log(`[Email Notification] Successfully sent via SMTP to ${recipient}`);
-        saveNotificationLog(record, { success: true, method: 'smtp' });
-        return { success: true, method: 'smtp' };
+        console.log(`[Email Notification] Successfully sent via ${isGmail ? 'Gmail' : 'SMTP'} to ${recipient}`);
+        saveNotificationLog(record, { success: true, method: isGmail ? 'gmail_smtp' : 'smtp' });
+        return { success: true, method: isGmail ? 'gmail_smtp' : 'smtp' };
       }
     } catch (e) {
       console.error(`[Email Notification] SMTP error:`, e.message || e);
+      return { success: false, method: isGmail ? 'gmail_smtp' : 'smtp', error: e.message || String(e) };
     }
   }
 
@@ -771,6 +782,86 @@ async function sendEmailNotification(record) {
   return { success: true, method: 'logged_and_backed_up' };
 }
 
+async function diagnoseEmail() {
+  loadLocalEnvFile();
+  const recipient =
+    process.env.NOTIFICATION_EMAIL ||
+    process.env.APPOINTMENT_NOTIFICATION_EMAIL ||
+    process.env.ADMIN_EMAIL ||
+    'wellbeingsessions@traumahealingwithrebeccadakin.co.uk';
+
+  const resendKey = Boolean(process.env.RESEND_API_KEY);
+  const sendgridKey = Boolean(process.env.SENDGRID_API_KEY);
+  const rawGmailPass = (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
+  const rawSmtpPass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').replace(/\s+/g, '');
+  const rawSmtpUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+  const rawGmailUser = process.env.GMAIL_USER || process.env.GOOGLE_USER;
+  const smtpHost = process.env.SMTP_HOST || process.env.EMAIL_HOST;
+
+  const isGmail = Boolean(rawGmailPass);
+  const authUser = isGmail
+    ? (rawGmailUser || (rawSmtpUser && /@(?:gmail|googlemail)\.com$/i.test(rawSmtpUser) ? rawSmtpUser : '') || rawSmtpUser)
+    : rawSmtpUser;
+  const authPass = isGmail ? rawGmailPass : rawSmtpPass;
+
+  const summary = {
+    notificationRecipient: recipient,
+    provider: resendKey ? 'Resend' : sendgridKey ? 'SendGrid' : isGmail ? 'Gmail SMTP' : (smtpHost && authUser) ? 'Custom SMTP' : 'Local Logging (No email credentials configured)',
+    configured: Boolean(resendKey || sendgridKey || (authUser && authPass)),
+  };
+
+  if (authUser || isGmail || smtpHost) {
+    summary.smtpDetails = {
+      isGmailService: isGmail,
+      loginUser: authUser || 'NOT_SET',
+      hasPassword: Boolean(authPass),
+      passwordLength: authPass ? authPass.length : 0,
+      host: isGmail ? 'smtp.gmail.com' : (smtpHost || 'smtp.gmail.com'),
+      port: Number(process.env.SMTP_PORT) || 587,
+    };
+
+    if (isGmail && authUser && !/@(?:gmail|googlemail)\.com$/i.test(authUser)) {
+      summary.smtpDetails.warning = `You set login user to '${authUser}'. Gmail App Passwords require a Gmail address (e.g. saqibsattar944@gmail.com). You cannot log into Gmail SMTP using a non-Gmail address.`;
+    }
+
+    try {
+      let nodemailer;
+      try {
+        nodemailer = require('nodemailer');
+      } catch {
+        nodemailer = null;
+      }
+
+      if (nodemailer && authUser && authPass) {
+        const transportConfig = isGmail
+          ? { service: 'gmail', auth: { user: authUser, pass: authPass } }
+          : {
+              host: smtpHost || 'smtp.gmail.com',
+              port: Number(process.env.SMTP_PORT) || 587,
+              secure: process.env.SMTP_SECURE === 'true' || process.env.SMTP_PORT === '465',
+              auth: { user: authUser, pass: authPass },
+            };
+        const transporter = nodemailer.createTransport(transportConfig);
+        try {
+          await transporter.verify();
+          summary.connectionTest = 'SUCCESS: SMTP login verified and ready to send.';
+        } catch (verifyErr) {
+          summary.connectionTest = `FAILED: ${verifyErr.message}`;
+          if (verifyErr.message && (verifyErr.message.includes('535') || verifyErr.message.includes('BadCredentials'))) {
+            summary.recommendation = "SMTP_USER must be the Gmail address that generated the 16-character App Password (e.g. saqibsattar944@gmail.com). Keep NOTIFICATION_EMAIL as wellbeingsessions@traumahealingwithrebeccadakin.co.uk so notifications arrive in Rebecca's inbox.";
+          }
+        }
+      } else if (!nodemailer) {
+        summary.connectionTest = 'FAILED: nodemailer package not found.';
+      }
+    } catch (e) {
+      summary.connectionTest = `ERROR: ${e.message}`;
+    }
+  }
+
+  return summary;
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -784,10 +875,15 @@ module.exports = async function handler(req, res) {
 
   if (req.method === 'GET') {
     try {
-      const diag = await diagnoseGoogleSheets();
+      const sheetsDiag = await diagnoseGoogleSheets();
+      const emailDiag = await diagnoseEmail();
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify(diag, null, 2));
+      res.end(JSON.stringify({
+        status: 'ok',
+        googleSheets: sheetsDiag,
+        emailNotification: emailDiag,
+      }, null, 2));
     } catch (err) {
       res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');
@@ -824,3 +920,5 @@ module.exports = async function handler(req, res) {
 };
 module.exports.saveAppointment = saveAppointment;
 module.exports.diagnoseGoogleSheets = diagnoseGoogleSheets;
+module.exports.diagnoseEmail = diagnoseEmail;
+

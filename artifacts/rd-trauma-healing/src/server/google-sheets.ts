@@ -492,14 +492,16 @@ export async function saveAppointment(payload: {
     emailNotificationResult = await sendEmailNotification(record);
   } catch (err: any) {
     console.error('[Email Notification] Error sending notification:', err);
+    emailNotificationResult = { success: false, method: 'none', error: err.message || String(err) };
   }
 
   return {
     success: true,
     appointmentId: id,
     googleSheetsSaved,
-    emailNotificationSent: emailNotificationResult.success,
+    emailNotificationSent: Boolean(emailNotificationResult.success),
     emailNotificationMethod: emailNotificationResult.method,
+    ...(emailNotificationResult.error ? { emailNotificationError: emailNotificationResult.error } : {}),
     ...(googleSheetsError && !googleSheetsSaved ? { googleSheetsError } : {}),
     message: 'Thank you. Your appointment request has been received. Rebecca will contact you to confirm your session.',
   };
@@ -548,6 +550,7 @@ function saveNotificationLog(record: AppointmentRecord, notificationResult: { su
  * Supports Resend, SendGrid, SMTP / Gmail, and local disk logging.
  */
 export async function sendEmailNotification(record: AppointmentRecord): Promise<{ success: boolean; method: string; error?: string }> {
+  loadLocalEnvFile();
   const recipient =
     process.env.NOTIFICATION_EMAIL ||
     process.env.APPOINTMENT_NOTIFICATION_EMAIL ||
@@ -672,38 +675,47 @@ export async function sendEmailNotification(record: AppointmentRecord): Promise<
 
   // Option 3: Nodemailer / SMTP (supports Gmail App Passwords, Custom SMTP)
   const smtpHost = process.env.SMTP_HOST || process.env.EMAIL_HOST;
-  const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER || process.env.GMAIL_USER;
-  const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.GMAIL_APP_PASSWORD;
+  const rawSmtpUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+  const rawGmailUser = process.env.GMAIL_USER || process.env.GOOGLE_USER;
+  const rawGmailPass = (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
+  const rawSmtpPass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').replace(/\s+/g, '');
 
-  if ((smtpHost && smtpUser && smtpPass) || (process.env.GMAIL_APP_PASSWORD && smtpUser)) {
+  const isGmail = Boolean(rawGmailPass);
+  let authUser = isGmail
+    ? (rawGmailUser || (rawSmtpUser && /@(?:gmail|googlemail)\.com$/i.test(rawSmtpUser) ? rawSmtpUser : '') || rawSmtpUser)
+    : rawSmtpUser;
+  const authPass = isGmail ? rawGmailPass : rawSmtpPass;
+
+  if (authUser && authPass) {
     try {
       const nodemailer = await import('nodemailer');
-      const cleanPass = (process.env.GMAIL_APP_PASSWORD || smtpPass || '').replace(/\s+/g, '');
-      const transportConfig: any = process.env.GMAIL_APP_PASSWORD
+      const transportConfig: any = isGmail
         ? {
             service: 'gmail',
-            auth: { user: smtpUser, pass: cleanPass },
+            auth: { user: authUser, pass: authPass },
           }
         : {
-            host: smtpHost,
+            host: smtpHost || 'smtp.gmail.com',
             port: Number(process.env.SMTP_PORT) || 587,
             secure: process.env.SMTP_SECURE === 'true' || process.env.SMTP_PORT === '465',
-            auth: { user: smtpUser, pass: cleanPass },
+            auth: { user: authUser, pass: authPass },
           };
 
       const transporter = (nodemailer.default || nodemailer).createTransport(transportConfig);
       await transporter.sendMail({
-        from: process.env.EMAIL_FROM || process.env.MAIL_FROM || `"RD Trauma Healing" <${smtpUser}>`,
+        from: process.env.EMAIL_FROM || process.env.MAIL_FROM || `"RD Trauma Healing" <${authUser}>`,
         to: recipient,
+        replyTo: `${record.patientName} <${record.email}>`,
         subject,
         text: plainText,
         html,
       });
-      console.log(`[Email Notification] Successfully sent via SMTP to ${recipient}`);
-      saveNotificationLog(record, { success: true, method: 'smtp' });
-      return { success: true, method: 'smtp' };
+      console.log(`[Email Notification] Successfully sent via ${isGmail ? 'Gmail' : 'SMTP'} to ${recipient}`);
+      saveNotificationLog(record, { success: true, method: isGmail ? 'gmail_smtp' : 'smtp' });
+      return { success: true, method: isGmail ? 'gmail_smtp' : 'smtp' };
     } catch (e: any) {
       console.error(`[Email Notification] SMTP error:`, e.message || e);
+      return { success: false, method: isGmail ? 'gmail_smtp' : 'smtp', error: e.message || String(e) };
     }
   }
 
@@ -720,4 +732,77 @@ export async function sendEmailNotification(record: AppointmentRecord): Promise<
 
   return { success: true, method: 'logged_and_backed_up' };
 }
+
+export async function diagnoseEmail(): Promise<any> {
+  loadLocalEnvFile();
+  const recipient =
+    process.env.NOTIFICATION_EMAIL ||
+    process.env.APPOINTMENT_NOTIFICATION_EMAIL ||
+    process.env.ADMIN_EMAIL ||
+    'wellbeingsessions@traumahealingwithrebeccadakin.co.uk';
+
+  const resendKey = Boolean(process.env.RESEND_API_KEY);
+  const sendgridKey = Boolean(process.env.SENDGRID_API_KEY);
+  const rawGmailPass = (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
+  const rawSmtpPass = (process.env.SMTP_PASS || process.env.EMAIL_PASS || '').replace(/\s+/g, '');
+  const rawSmtpUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+  const rawGmailUser = process.env.GMAIL_USER || process.env.GOOGLE_USER;
+  const smtpHost = process.env.SMTP_HOST || process.env.EMAIL_HOST;
+
+  const isGmail = Boolean(rawGmailPass);
+  const authUser = isGmail
+    ? (rawGmailUser || (rawSmtpUser && /@(?:gmail|googlemail)\.com$/i.test(rawSmtpUser) ? rawSmtpUser : '') || rawSmtpUser)
+    : rawSmtpUser;
+  const authPass = isGmail ? rawGmailPass : rawSmtpPass;
+
+  const summary: any = {
+    notificationRecipient: recipient,
+    provider: resendKey ? 'Resend' : sendgridKey ? 'SendGrid' : isGmail ? 'Gmail SMTP' : (smtpHost && authUser) ? 'Custom SMTP' : 'Local Logging (No email credentials configured)',
+    configured: Boolean(resendKey || sendgridKey || (authUser && authPass)),
+  };
+
+  if (authUser || isGmail || smtpHost) {
+    summary.smtpDetails = {
+      isGmailService: isGmail,
+      loginUser: authUser || 'NOT_SET',
+      hasPassword: Boolean(authPass),
+      passwordLength: authPass ? authPass.length : 0,
+      host: isGmail ? 'smtp.gmail.com' : (smtpHost || 'smtp.gmail.com'),
+      port: Number(process.env.SMTP_PORT) || 587,
+    };
+
+    if (isGmail && authUser && !/@(?:gmail|googlemail)\.com$/i.test(authUser)) {
+      summary.smtpDetails.warning = `You set login user to '${authUser}'. Gmail App Passwords require a Gmail address (e.g. saqibsattar944@gmail.com). You cannot log into Gmail SMTP using a non-Gmail address.`;
+    }
+
+    try {
+      const nodemailer = await import('nodemailer');
+      if (authUser && authPass) {
+        const transportConfig: any = isGmail
+          ? { service: 'gmail', auth: { user: authUser, pass: authPass } }
+          : {
+              host: smtpHost || 'smtp.gmail.com',
+              port: Number(process.env.SMTP_PORT) || 587,
+              secure: process.env.SMTP_SECURE === 'true' || process.env.SMTP_PORT === '465',
+              auth: { user: authUser, pass: authPass },
+            };
+        const transporter = (nodemailer.default || nodemailer).createTransport(transportConfig);
+        try {
+          await transporter.verify();
+          summary.connectionTest = 'SUCCESS: SMTP login verified and ready to send.';
+        } catch (verifyErr: any) {
+          summary.connectionTest = `FAILED: ${verifyErr.message}`;
+          if (verifyErr.message && (verifyErr.message.includes('535') || verifyErr.message.includes('BadCredentials'))) {
+            summary.recommendation = "SMTP_USER must be the Gmail address that generated the 16-character App Password (e.g. saqibsattar944@gmail.com). Keep NOTIFICATION_EMAIL as wellbeingsessions@traumahealingwithrebeccadakin.co.uk so notifications arrive in Rebecca's inbox.";
+          }
+        }
+      }
+    } catch (e: any) {
+      summary.connectionTest = `ERROR: ${e.message}`;
+    }
+  }
+
+  return summary;
+}
+
 
